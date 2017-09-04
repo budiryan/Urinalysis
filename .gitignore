@@ -1,0 +1,42 @@
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+*.crf
+*.d
+*._2i
+*.map
+*.axf
+*.hex
+*.htm
+*.dep
+*.lst
+*.lnp
+*.sct
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+#User specific file
+*.uvguix.*

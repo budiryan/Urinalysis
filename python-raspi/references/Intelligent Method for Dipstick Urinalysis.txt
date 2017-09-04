@@ -1,0 +1,10 @@
+Abstract:
+- Framework for color acquisition using a smartphone camera
+- Covers: color management system, color correction, color matching, quantification
+- Color space: RGB and CIELAB
+- An automated color constancy approach is introduced to provide a better color correction
+- A step-wise linear interpolation is introduced to better estimate the urinalysis value
+- summary: color constancy --> step-wise linear interpolation
+
+Methodology
+
