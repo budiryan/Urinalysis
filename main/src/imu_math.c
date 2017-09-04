@@ -1,5 +1,6 @@
 #include "imu_math.h"
-extern bool imu_fucked_up;
+
+bool imu_fucked_up;
 
 
 s16 abs_diff(s16 minuend, s16 subtrahend){

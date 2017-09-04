@@ -5,7 +5,7 @@
 #include "stm32f4xx_gpio.h"
 #include <stdint.h>
 
-#define LED_GPIO_PIN GPIO_Pin_2
+#define LED_GPIO_PIN GPIO_Pin_4
 #define LED_GPIO GPIOC
 
 void led_init(void);

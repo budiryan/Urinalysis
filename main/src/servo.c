@@ -19,12 +19,12 @@ void servo_init(void){
 	RCC_AHB1PeriphClockCmd(SERVO_GPIO_RCC, ENABLE);	// Enable bus
 
 	SERVO_GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;						// Push-Pull Output Alternate-function
-	SERVO_GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
+	SERVO_GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	
 	for (servo_id = 0; servo_id < 1; ++servo_id){
-		if (servo_pwm[servo_id].state == DISABLE) {
-				continue;
-			}
+		//if (servo_pwm[servo_id].state == DISABLE) {
+		//		continue;
+		//	}
 		SERVO_GPIO_InitStructure.GPIO_Pin=servo_pwm[servo_id].servo_pin;
 		GPIO_Init(servo_pwm[servo_id].GPIOx , &SERVO_GPIO_InitStructure);	
 		GPIO_PinAFConfig(servo_pwm[servo_id].GPIOx, servo_pwm[servo_id].GPIO_PinSource, GPIO_AF_TIM1);
@@ -38,7 +38,7 @@ void servo_init(void){
 
 	//------------------------------//
 	TIM_TimeBaseStructure.TIM_Prescaler = 167;												//clk=84M/(83+1)=1 MHz, Freq = 1000000 / 20000 = 50Hz Interval = 20ms
-	TIM_TimeBaseStructure.TIM_Period = 20000;												//pulse cycle= 20000 
+	TIM_TimeBaseStructure.TIM_Period = 400;												//pulse cycle= 20000 
 	//------------------------------//
 
 	TIM_TimeBaseInit(SERVO_TIM, &TIM_TimeBaseStructure);
@@ -53,7 +53,7 @@ void servo_init(void){
 	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;  	// this part enable the output
 	TIM_OCInitStructure.TIM_OutputNState = TIM_OutputState_Disable; // this part disable the Nstate
 	//------------------------------//
-	TIM_OCInitStructure.TIM_Pulse = 1000;														// this part sets the initial CCR value ,CCR = ExpPulseWidth * 1000
+	TIM_OCInitStructure.TIM_Pulse = 250;														// this part sets the initial CCR value ,CCR = ExpPulseWidth * 1000
 	//------------------------------//
 	
 	// OC Init
