@@ -5,7 +5,6 @@ int main() {
     //system_init();
     /*Test run pump */
     // Step pin: PA8 P11
-    
     servo_init();
     
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE); //enable the clock
@@ -34,17 +33,6 @@ int main() {
             LED_OFF();
             GPIO_ResetBits(GPIOC, GPIO_Pin_3);
         }
-        
-        /*
-        LED_ON();
-        GPIO_SetBits(GPIOC, GPIO_Pin_3);
-        //servo_control(SERVO1, 15000);
-        _delay_us(1500);
-        LED_OFF();
-        GPIO_ResetBits(GPIOC, GPIO_Pin_3);
-        //servo_control(SERVO1, 0);
-        _delay_us(1500);
-        */
     }
     return 0;
 } 
