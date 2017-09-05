@@ -5,15 +5,14 @@ int main() {
     led_init();			//Initiate LED
     ticks_init();		//Ticks initialization
     pump_init();
+    pump(300, CCW);
     while(true){
-        // Test LED ON OFF
-        if(get_full_ticks() % 2000 == 0){
+        // Test LED ON OF F
+        if(get_full_ticks() % 4000 == 0){
             LED_ON();
-            pump(350, CCW);
         }
-        else if(get_full_ticks() % 2000 == 1000){
+        else if(get_full_ticks() % 4000 == 2000){
             LED_OFF();
-            pump(350, CW);
         }
     }
 } 

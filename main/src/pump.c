@@ -10,14 +10,14 @@ void pump(u16 speed, PUMP_DIRECTION direction){
     
     switch(direction){
         case CW:
-            GPIO_SetBits(DIR_GPIO, DIR_GPIO_PIN);
+            GPIO_ResetBits(DIR_GPIO, DIR_GPIO_PIN);
             break;
         case CCW:
-            GPIO_ResetBits(DIR_GPIO, DIR_GPIO_PIN);
+            GPIO_SetBits(DIR_GPIO, DIR_GPIO_PIN);
             break;
     }
     // Set step pwm
-    TIM_SetCompare1(STEP_TIM, speed);
+    TIM_SetCompare4(STEP_TIM, speed);
 }
 
 // Default PWM frequency for Step pin is: 2500 hz
@@ -26,7 +26,7 @@ void _step_init(void){
 	TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
 	TIM_OCInitTypeDef  TIM_OCInitStructure;
 
-	RCC_APB2PeriphClockCmd(STEP_TIM_RCC, ENABLE);
+	RCC_APB1PeriphClockCmd(STEP_TIM_RCC, ENABLE);
 	RCC_AHB1PeriphClockCmd(STEP_GPIO_RCC, ENABLE);	// Enable bus
 
 	STEP_GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF; // Push-Pull Output Alternate-function
@@ -61,8 +61,8 @@ void _step_init(void){
 	//------------------------------//
 	
 	// OC Init
-	TIM_OC1Init(STEP_TIM, &TIM_OCInitStructure);
-	TIM_OC1PreloadConfig(STEP_TIM, ENABLE);
+	TIM_OC4Init(STEP_TIM, &TIM_OCInitStructure);
+	TIM_OC4PreloadConfig(STEP_TIM, ENABLE);
 	
 	TIM_ARRPreloadConfig(STEP_TIM, ENABLE);
 	TIM_Cmd(STEP_TIM, ENABLE);	
