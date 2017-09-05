@@ -19,13 +19,12 @@ typedef struct {
 	uint16_t GPIO_PinSource;
 	FunctionalState state;
 	void (*oc_init_function)(TIM_TypeDef* TIMx, TIM_OCInitTypeDef* TIM_OCInitStruct);
-  void (*TIM_SetCompare) (TIM_TypeDef* TIMx, uint32_t Compare1);
+    void (*TIM_SetCompare) (TIM_TypeDef* TIMx, uint32_t Compare1);
 } SERVO_PWM_STRUCT[];
 
 typedef enum {
   SERVO1
 } SERVO_ID;
-
 
 
 void servo_init(void);

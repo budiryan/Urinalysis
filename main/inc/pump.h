@@ -21,13 +21,14 @@
 #define STEP_GPIO_PIN          GPIO_Pin_8
 #define STEP_GPIO_PINSOURCE    GPIO_PinSource8
 #define STEP_GPIO_RCC	       RCC_AHB1Periph_GPIOA
-#define STEP_FUNCTIONAL_STATE  ENABLE
-#define STEP_OC_INIT_FUNCTION  TIM_OC1Init
-#define STEP_SETCOMPARE        TIM_SetCompare1
 
-//static SERVO_PWM_STRUCT servo_pwm = {{TIM_Channel_1, GPIOA, GPIO_Pin_8, GPIO_PinSource8, ENABLE, TIM_OC1Init, TIM_SetCompare1}};
+typedef enum {
+  CW, CCW
+} PUMP_DIRECTION;
+
 
 void pump_init(void);
+void pump(u16 speed, PUMP_DIRECTION direction);
 void _step_init(void);
 void _dir_init(void);
 

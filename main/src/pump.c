@@ -5,10 +5,22 @@ void pump_init(void){
     _dir_init();
 }
 
-void pump(){
+void pump(u16 speed, PUMP_DIRECTION direction){
+    // Set dir pin
     
+    switch(direction){
+        case CW:
+            GPIO_SetBits(DIR_GPIO, DIR_GPIO_PIN);
+            break;
+        case CCW:
+            GPIO_ResetBits(DIR_GPIO, DIR_GPIO_PIN);
+            break;
+    }
+    // Set step pwm
+    TIM_SetCompare1(STEP_TIM, speed);
 }
 
+// Default PWM frequency for Step pin is: 2500 hz
 void _step_init(void){
     GPIO_InitTypeDef STEP_GPIO_InitStructure;
 	TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
@@ -18,7 +30,7 @@ void _step_init(void){
 	RCC_AHB1PeriphClockCmd(STEP_GPIO_RCC, ENABLE);	// Enable bus
 
 	STEP_GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF; // Push-Pull Output Alternate-function
-	STEP_GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	STEP_GPIO_InitStructure.GPIO_Speed = GPIO_High_Speed;
 
 	STEP_GPIO_InitStructure.GPIO_Pin = STEP_GPIO_PIN; 
 	GPIO_Init(STEP_GPIO , &STEP_GPIO_InitStructure);	
@@ -45,7 +57,7 @@ void _step_init(void){
 	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;  	// this part enable the output
 	TIM_OCInitStructure.TIM_OutputNState = TIM_OutputState_Disable; // this part disable the Nstate
 	//------------------------------//
-	TIM_OCInitStructure.TIM_Pulse = 250;														// this part sets the initial CCR value ,CCR = ExpPulseWidth * 1000
+	TIM_OCInitStructure.TIM_Pulse = 250;    // this part sets the initial CCR value ,CCR = ExpPulseWidth * 1000
 	//------------------------------//
 	
 	// OC Init
@@ -60,11 +72,11 @@ void _step_init(void){
 void _dir_init(void){
     RCC_AHB1PeriphClockCmd(DIR_GPIO_RCC, ENABLE); //enable the clock
 	GPIO_InitTypeDef GPIO_InitStructure;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Low_Speed;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
 	GPIO_InitStructure.GPIO_Pin = DIR_GPIO_PIN;
 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
 	GPIO_Init(DIR_GPIO, &GPIO_InitStructure);
-    GPIO_SetBits(DIR_GPIO, DIR_GPIO_PIN);
+    GPIO_ResetBits(DIR_GPIO, DIR_GPIO_PIN);
 }
