@@ -5,9 +5,8 @@ void stepper_init(void){
     _stepper_dir_init();
 }
 
-void stepper_spin(u16 speed, STEPPER_DIRECTION direction){
+void stepper_spin(STEPPER_DIRECTION direction){
     // Set dir pin
-    
     switch(direction){
         case STEPPER_CW:
             GPIO_SetBits(STEPPER_DIR_GPIO, STEPPER_DIR_GPIO_PIN);
@@ -17,7 +16,7 @@ void stepper_spin(u16 speed, STEPPER_DIRECTION direction){
             break;
     }
     // Set step pwm
-    TIM_SetCompare1(STEPPER_STEP_TIM, speed);
+    TIM_SetCompare1(STEPPER_STEP_TIM, 0);
 }
 
 // Default PWM frequency for Step pin is: 2500 hz
@@ -43,7 +42,7 @@ void _stepper_step_init(void){
 
 	//------------------------------//
 	TIM_TimeBaseStructure.TIM_Prescaler = 167;  //clk=168M/(167+1)=1 MHz, Freq = 1000000 / 400 = 2500Hz
-	TIM_TimeBaseStructure.TIM_Period = 400;     //pulse cycle= 20000 
+	TIM_TimeBaseStructure.TIM_Period = 4000;     //pulse cycle= 400 
 	//------------------------------//
 
 	TIM_TimeBaseInit(STEPPER_STEP_TIM, &TIM_TimeBaseStructure);

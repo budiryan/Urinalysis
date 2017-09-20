@@ -6,8 +6,10 @@ int main() {
     ticks_init();		//Ticks initialization
     pump_init();
     stepper_init();
-    pump(350, CW);
-    stepper_spin(350, STEPPER_CCW);
+    pump(300, CW);
+    button_init();
+    // Stepper motor does not depend on duty cycle of the pwm
+    stepper_spin(STEPPER_CW);
     while(true){
         // Test LED ON OF F
         if(get_full_ticks() % 4000 == 0){

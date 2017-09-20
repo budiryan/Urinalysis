@@ -42,8 +42,8 @@ void _pump_step_init(void){
 	TIM_TimeBaseStructure.TIM_RepetitionCounter = 0;
 
 	//------------------------------//
-	TIM_TimeBaseStructure.TIM_Prescaler = 167;  //clk=168M/(167+1)=1 MHz, Freq = 1000000 / 400 = 2500Hz
-	TIM_TimeBaseStructure.TIM_Period = 400;     //pulse cycle= 20000 
+	TIM_TimeBaseStructure.TIM_Prescaler = 167;  //clk=168M/(167+1)=1 MHz, Freq = 1,000,000 / 400 = 2500Hz
+	TIM_TimeBaseStructure.TIM_Period = 400;     //pulse cycle= 400 
 	//------------------------------//
 
 	TIM_TimeBaseInit(PUMP_STEP_TIM, &TIM_TimeBaseStructure);
