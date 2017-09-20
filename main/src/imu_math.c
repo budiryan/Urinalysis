@@ -25,7 +25,6 @@ float fabs_diff(float minuend, float subtrahend){
         if((get_full_ticks() - time_start) > 5){
             imu_fucked_up = true;
             return diff;
-            break;
         }
 	}
 	while(diff < -180.0f){
@@ -36,7 +35,6 @@ float fabs_diff(float minuend, float subtrahend){
         if((get_full_ticks() - time_start) > 5){
             imu_fucked_up = true;
             return diff;
-            break;
         }
 	}
     return diff;

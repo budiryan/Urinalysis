@@ -5,14 +5,22 @@ int main() {
     led_init();			//Initiate LED
     ticks_init();		//Ticks initialization
     pump_init();
-    pump(300, CCW);
+    stepper_init();
+    pump(350, CW);
+    stepper_spin(350, STEPPER_CCW);
     while(true){
         // Test LED ON OF F
         if(get_full_ticks() % 4000 == 0){
             LED_ON();
+            // DEBUG
+            // stepper_spin(400, STEPPER_CW);
+            // pump(400, CCW);
         }
         else if(get_full_ticks() % 4000 == 2000){
             LED_OFF();
+            //DEBUG
+            //stepper_spin(0, STEPPER_CCW);
+            //pump(0, CW);
         }
     }
 } 

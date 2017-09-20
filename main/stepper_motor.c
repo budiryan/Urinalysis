@@ -1,40 +1,40 @@
-#include "pump.h"
+#include "stepper_motor.h"
 
-void pump_init(void){
-    _pump_step_init();
-    _pump_dir_init();
+void stepper_init(void){
+    _stepper_step_init();
+    _stepper_dir_init();
 }
 
-void pump(u16 speed, PUMP_DIRECTION direction){
+void stepper_spin(u16 speed, STEPPER_DIRECTION direction){
     // Set dir pin
     
     switch(direction){
-        case CW:
-            GPIO_ResetBits(DIR_GPIO, DIR_GPIO_PIN);
+        case STEPPER_CW:
+            GPIO_SetBits(STEPPER_DIR_GPIO, STEPPER_DIR_GPIO_PIN);
             break;
-        case CCW:
-            GPIO_SetBits(DIR_GPIO, DIR_GPIO_PIN);
+        case STEPPER_CCW:
+            GPIO_ResetBits(STEPPER_DIR_GPIO, STEPPER_DIR_GPIO_PIN);
             break;
     }
     // Set step pwm
-    TIM_SetCompare4(PUMP_STEP_TIM, speed);
+    TIM_SetCompare1(STEPPER_STEP_TIM, speed);
 }
 
-// Default PWM frequency for Step pin is: 2500 hz, Max speed: 400
-void _pump_step_init(void){
+// Default PWM frequency for Step pin is: 2500 hz
+void _stepper_step_init(void){
     GPIO_InitTypeDef STEP_GPIO_InitStructure;
 	TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
 	TIM_OCInitTypeDef  TIM_OCInitStructure;
 
-	RCC_APB1PeriphClockCmd(PUMP_STEP_TIM_RCC, ENABLE);
-	RCC_AHB1PeriphClockCmd(PUMP_STEP_GPIO_RCC, ENABLE);	// Enable bus
+	RCC_APB2PeriphClockCmd(STEPPER_STEP_TIM_RCC, ENABLE);
+	RCC_AHB1PeriphClockCmd(STEPPER_STEP_GPIO_RCC, ENABLE);	// Enable bus
 
 	STEP_GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF; // Push-Pull Output Alternate-function
 	STEP_GPIO_InitStructure.GPIO_Speed = GPIO_High_Speed;
 
-	STEP_GPIO_InitStructure.GPIO_Pin = PUMP_STEP_GPIO_PIN; 
-	GPIO_Init(PUMP_STEP_GPIO , &STEP_GPIO_InitStructure);	
-	GPIO_PinAFConfig(PUMP_STEP_GPIO, PUMP_STEP_GPIO_PINSOURCE, GPIO_AF_TIM1);
+	STEP_GPIO_InitStructure.GPIO_Pin = STEPPER_STEP_GPIO_PIN; 
+	GPIO_Init(STEPPER_STEP_GPIO , &STEP_GPIO_InitStructure);	
+	GPIO_PinAFConfig(STEPPER_STEP_GPIO, STEPPER_STEP_GPIO_PINSOURCE, GPIO_AF_TIM1);
 	
 	//-------------TimeBase Initialization-----------//
 	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up; // counter will count up (from 0 to FFFF)
@@ -46,7 +46,7 @@ void _pump_step_init(void){
 	TIM_TimeBaseStructure.TIM_Period = 400;     //pulse cycle= 20000 
 	//------------------------------//
 
-	TIM_TimeBaseInit(PUMP_STEP_TIM, &TIM_TimeBaseStructure);
+	TIM_TimeBaseInit(STEPPER_STEP_TIM, &TIM_TimeBaseStructure);
 	
 	// ------------OC Init Configuration------------//
 	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;   		// set "high" to be effective output
@@ -61,22 +61,22 @@ void _pump_step_init(void){
 	//------------------------------//
 	
 	// OC Init
-	TIM_OC4Init(PUMP_STEP_TIM, &TIM_OCInitStructure);
-	TIM_OC4PreloadConfig(PUMP_STEP_TIM, ENABLE);
+	TIM_OC1Init(STEPPER_STEP_TIM, &TIM_OCInitStructure);
+	TIM_OC1PreloadConfig(STEPPER_STEP_TIM, ENABLE);
 	
-	TIM_ARRPreloadConfig(PUMP_STEP_TIM, ENABLE);
-	TIM_Cmd(PUMP_STEP_TIM, ENABLE);	
-	TIM_CtrlPWMOutputs(PUMP_STEP_TIM, ENABLE);
+	TIM_ARRPreloadConfig(STEPPER_STEP_TIM, ENABLE);
+	TIM_Cmd(STEPPER_STEP_TIM, ENABLE);	
+	TIM_CtrlPWMOutputs(STEPPER_STEP_TIM, ENABLE);
 }
 
-void _pump_dir_init(void){
-    RCC_AHB1PeriphClockCmd(DIR_GPIO_RCC, ENABLE); //enable the clock
+void _stepper_dir_init(void){
+    RCC_AHB1PeriphClockCmd(STEPPER_DIR_GPIO_RCC, ENABLE); //enable the clock
 	GPIO_InitTypeDef GPIO_InitStructure;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-	GPIO_InitStructure.GPIO_Pin = DIR_GPIO_PIN;
+	GPIO_InitStructure.GPIO_Pin = STEPPER_DIR_GPIO_PIN;
 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-	GPIO_Init(DIR_GPIO, &GPIO_InitStructure);
-    GPIO_ResetBits(DIR_GPIO, DIR_GPIO_PIN);
+	GPIO_Init(STEPPER_DIR_GPIO, &GPIO_InitStructure);
+    GPIO_ResetBits(STEPPER_DIR_GPIO, STEPPER_DIR_GPIO_PIN);
 }

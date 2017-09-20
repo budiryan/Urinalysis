@@ -1,0 +1,7 @@
+Grey: step pin motor
+Purple: Dir pin motor
+Red: VCC motor
+
+White: VCC pump
+Brown: Step pin pump
+Black: Dir pin pump

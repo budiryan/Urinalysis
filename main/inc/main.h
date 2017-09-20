@@ -54,6 +54,7 @@
 #include "ardu_imu.h"
 #include "MTi-1_UART.h"
 #include "pump.h"
+#include "stepper_motor.h"
 
 
 
