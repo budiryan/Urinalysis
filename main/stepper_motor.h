@@ -7,12 +7,12 @@
 #include "ticks.h"
 #include <stdint.h>
 
-// Dir pin: PC2 P14
-#define STEPPER_DIR_GPIO_PIN GPIO_Pin_2
+// Dir pin: PC9
+#define STEPPER_DIR_GPIO_PIN GPIO_Pin_9
 #define STEPPER_DIR_GPIO GPIOC
 #define STEPPER_DIR_GPIO_RCC RCC_AHB1Periph_GPIOC
 
-// Step pin: Step pin: PA8 P11
+// Step pin: Step pin: PA8
 #define STEPPER_STEP_TIM			   TIM1
 #define STEPPER_STEP_TIM_CHANNEL       TIM_Channel_1
 #define STEPPER_STEP_AF_TIM 		   GPIO_AF_TIM1

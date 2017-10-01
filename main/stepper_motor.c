@@ -16,7 +16,7 @@ void stepper_spin(STEPPER_DIRECTION direction){
             break;
     }
     // Set step pwm
-    TIM_SetCompare1(STEPPER_STEP_TIM, 0);
+    TIM_SetCompare1(STEPPER_STEP_TIM, 10);
 }
 
 // Default PWM frequency for Step pin is: 2500 hz

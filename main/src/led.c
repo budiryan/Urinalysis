@@ -19,10 +19,10 @@ void led_init(){
 
  
 void LED_OFF(){
-	GPIO_ResetBits(LED_GPIO,LED_GPIO_PIN_1 | LED_GPIO_PIN_2);
+	GPIO_SetBits(LED_GPIO,LED_GPIO_PIN_1 | LED_GPIO_PIN_2);
 }
 
 void LED_ON(){
-	GPIO_SetBits(LED_GPIO,LED_GPIO_PIN_1 | LED_GPIO_PIN_2);
+	GPIO_ResetBits(LED_GPIO,LED_GPIO_PIN_1 | LED_GPIO_PIN_2);
 }
 

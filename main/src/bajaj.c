@@ -59,8 +59,8 @@ bool system_on;
 ENCODER USED_ENCODER = ENCODER1;
 
 void initalize_values(void){
-    if(button_pressed(BUTTON_RED)){
-        while(button_pressed(BUTTON_RED));
+    if(button_pressed(BUTTON_K0)){
+        while(button_pressed(BUTTON_K0));
         //Tune for competition
         ENTER_RIVER_ENCODER = 6300;
         SECOND_RIVER_ENCODER = 4500;
@@ -83,8 +83,8 @@ void initalize_values(void){
         ardu_cal_ypr[0] = (float)0;
         system_on = 1;
     }
-    else if(button_pressed(BUTTON_WHITE)){
-        while(button_pressed(BUTTON_WHITE));
+    else if(button_pressed(BUTTON_K1)){
+        while(button_pressed(BUTTON_K1));
         //Tune for competition
         ENTER_RIVER_ENCODER = 7500;
         SECOND_RIVER_ENCODER = 5500;
@@ -418,10 +418,10 @@ void determine_zone(){
 
 void run_user_interface(void){
     //User Interface Section
-    if(button_pressed(BUTTON_RED)){
+    if(button_pressed(BUTTON_K0)){
         button_count_red++;
         if(button_count_red > 100){
-            while(button_pressed(BUTTON_RED));
+            while(button_pressed(BUTTON_K0));
             switch(button_red_count){
                 case 0:
                     current_slope_zone = GREENSLOPE1;
@@ -460,10 +460,10 @@ void run_user_interface(void){
         }
     }
     
-    if(button_pressed(BUTTON_WHITE)){
+    if(button_pressed(BUTTON_K1)){
         button_count_white++;
         if(button_count_white > 100){
-            while(button_pressed(BUTTON_WHITE));
+            while(button_pressed(BUTTON_K1));
             switch(button_white_count){
                 case 0:
                     full_white = 1;
