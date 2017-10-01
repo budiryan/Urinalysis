@@ -55,6 +55,12 @@
 #include "MTi-1_UART.h"
 #include "pump.h"
 #include "stepper_motor.h"
+#include "tm_stm32f4_gpio.h"
+#include "tm_stm32f4_fonts.h"
+#include "tm_stm32f4_dma.h"
+#include "tm_stm32f4_ili9341.h"
+#include "tm_stm32f4_spi.h"
+#include "tm_stm32f4_spi_dma.h"
 
 
 

@@ -60,8 +60,8 @@ typedef enum {
 
 
 
-#define MAX_WIDTH				128
-#define MAX_HEIGHT				160
+#define MAX_WIDTH				240
+#define MAX_HEIGHT				320
 #define CHAR_WIDTH				8
 #define CHAR_HEIGHT				16
 

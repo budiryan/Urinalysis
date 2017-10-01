@@ -766,6 +766,46 @@
               <FileType>1</FileType>
               <FilePath>.\src\adc.c</FilePath>
             </File>
+            <File>
+              <FileName>stepper_motor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\stepper_motor.c</FilePath>
+            </File>
+            <File>
+              <FileName>pump.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\pump.c</FilePath>
+            </File>
+            <File>
+              <FileName>tm_stm32f4_dma.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\tm_stm32f4_dma.c</FilePath>
+            </File>
+            <File>
+              <FileName>tm_stm32f4_fonts.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\tm_stm32f4_fonts.c</FilePath>
+            </File>
+            <File>
+              <FileName>tm_stm32f4_gpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\tm_stm32f4_gpio.c</FilePath>
+            </File>
+            <File>
+              <FileName>tm_stm32f4_ili9341.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\tm_stm32f4_ili9341.c</FilePath>
+            </File>
+            <File>
+              <FileName>tm_stm32f4_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\tm_stm32f4_spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>tm_stm32f4_spi_dma.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\tm_stm32f4_spi_dma.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
