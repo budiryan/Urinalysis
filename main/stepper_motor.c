@@ -5,7 +5,7 @@ void stepper_init(void){
     _stepper_dir_init();
 }
 
-void stepper_spin(STEPPER_DIRECTION direction){
+void stepper_spin(STEPPER_DIRECTION direction, u8 speed){
     // Set dir pin
     switch(direction){
         case STEPPER_CW:
@@ -16,7 +16,7 @@ void stepper_spin(STEPPER_DIRECTION direction){
             break;
     }
     // Set step pwm
-    TIM_SetCompare1(STEPPER_STEP_TIM, 10);
+    TIM_SetCompare1(STEPPER_STEP_TIM, speed);
 }
 
 // Default PWM frequency for Step pin is: 2500 hz

@@ -13,16 +13,16 @@ void led_init(){
 	GPIO_InitStructure.GPIO_Pin = LED_GPIO_PIN_1 | LED_GPIO_PIN_2;
 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
 	GPIO_Init(LED_GPIO, &GPIO_InitStructure);
-	LED_OFF();
+	LED_OFF(LED_1 | LED_2);
 }
 
 
  
-void LED_OFF(){
-	GPIO_SetBits(LED_GPIO,LED_GPIO_PIN_1 | LED_GPIO_PIN_2);
+void LED_OFF(LED led){
+	GPIO_SetBits(LED_GPIO, led);
 }
 
-void LED_ON(){
-	GPIO_ResetBits(LED_GPIO,LED_GPIO_PIN_1 | LED_GPIO_PIN_2);
+void LED_ON(LED led){
+	GPIO_ResetBits(LED_GPIO, led);
 }
 

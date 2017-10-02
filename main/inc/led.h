@@ -10,12 +10,12 @@
 #define LED_GPIO GPIOA
 
 typedef enum {
-  LED_1,
-  LED_2
+  LED_1 = LED_GPIO_PIN_1,
+  LED_2 = LED_GPIO_PIN_2
 } LED;
 
 void led_init(void);
-void LED_OFF(void);
-void LED_ON(void);
+void LED_OFF(LED led);
+void LED_ON(LED led);
 
 #endif

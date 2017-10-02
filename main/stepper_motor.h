@@ -28,7 +28,7 @@ typedef enum {
 
 
 void stepper_init(void);
-void stepper_spin(STEPPER_DIRECTION direction);
+void stepper_spin(STEPPER_DIRECTION direction, u8 speed);
 void _stepper_step_init(void);
 void _stepper_dir_init(void);
 

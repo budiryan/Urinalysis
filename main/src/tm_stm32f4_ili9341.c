@@ -349,6 +349,7 @@ void TM_ILI9341_Rotate(TM_ILI9341_Orientation_t orientation) {
 	}
 }
 
+
 void TM_ILI9341_Puts(uint16_t x, uint16_t y, char *str, TM_FontDef_t *font, uint32_t foreground, uint32_t background) {
 	uint16_t startX = x;
 	
