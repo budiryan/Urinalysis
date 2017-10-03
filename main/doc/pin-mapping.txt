@@ -1,6 +1,6 @@
 Stepper motor:
 Grey: step pin motor - PA8
-Purple: Dir pin motor - PC9
+Purple: Dir pin motor - PC9 --> PD4
 Red: VCC motor
 
 Pump:
@@ -13,7 +13,7 @@ D2: PC6
 D3: PC7
 D4: PE0
 D5: PE1
-D6: PE4
+D6: PE4 --> ganti jadi PC11
 D7: PB6
 D8: PE5
 D9: PE6
@@ -31,3 +31,11 @@ RST: PD12
 SCK: PB3
 MOSI: PB5
 MISO: Not Used
+
+Button:
+K0: PE4 -- Tabrakan sama D6 Camera
+K1: PE3
+
+LED:
+LED1: PA6 -- Tabrakan PXCLK Camera
+LED2: PA7
