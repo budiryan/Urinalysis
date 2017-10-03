@@ -806,6 +806,11 @@
               <FileType>1</FileType>
               <FilePath>.\src\tm_stm32f4_spi_dma.c</FilePath>
             </File>
+            <File>
+              <FileName>dcmi_ov9655.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\dcmi_ov9655.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

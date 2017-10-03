@@ -61,6 +61,7 @@
 #include "tm_stm32f4_ili9341.h"
 #include "tm_stm32f4_spi.h"
 #include "tm_stm32f4_spi_dma.h"
+#include "dcmi_ov9655.h"
 
 
 

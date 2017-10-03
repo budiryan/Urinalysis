@@ -10,10 +10,10 @@ void led_init(){
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_DOWN;
-	GPIO_InitStructure.GPIO_Pin = LED_GPIO_PIN_1 | LED_GPIO_PIN_2;
+	GPIO_InitStructure.GPIO_Pin = LED_GPIO_PIN_2;
 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
 	GPIO_Init(LED_GPIO, &GPIO_InitStructure);
-	LED_OFF(LED_1 | LED_2);
+	LED_OFF(LED_2);
 }
 
 

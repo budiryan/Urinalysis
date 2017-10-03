@@ -5,12 +5,11 @@
 #include "stm32f4xx_gpio.h"
 #include <stdint.h>
 
-#define LED_GPIO_PIN_1 GPIO_Pin_6
+// #define LED_GPIO_PIN_1 GPIO_Pin_6 --> PA6 is not available anymore
 #define LED_GPIO_PIN_2 GPIO_Pin_7
 #define LED_GPIO GPIOA
 
 typedef enum {
-  LED_1 = LED_GPIO_PIN_1,
   LED_2 = LED_GPIO_PIN_2
 } LED;
 

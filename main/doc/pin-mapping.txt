@@ -1,7 +1,33 @@
-Grey: step pin motor
-Purple: Dir pin motor
+Stepper motor:
+Grey: step pin motor - PA8
+Purple: Dir pin motor - PC9
 Red: VCC motor
 
+Pump:
 White: VCC pump
-Brown: Step pin pump
-Black: Dir pin pump
+Brown: Step pin pump PA3
+Black: Dir pin pump PA2
+
+Camera:
+D2: PC6
+D3: PC7
+D4: PE0
+D5: PE1
+D6: PE4
+D7: PB6
+D8: PE5
+D9: PE6
+HSYNC = PA4 
+VSYNC = PB7 
+XCLK = PC9 
+PXCLK = PA6 
+SIO_C = PB8 
+SIO_D = PB9
+
+LCD:
+CS: PC2
+D/C: PD13
+RST: PD12
+SCK: PB3
+MOSI: PB5
+MISO: Not Used

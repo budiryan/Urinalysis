@@ -3,11 +3,11 @@
 
 #include "stm32f4xx_tim.h"
 
-#define TICKS_TIM							TIM4
-#define TICKS_RCC							RCC_APB1Periph_TIM4
+#define TICKS_TIM							TIM5
+#define TICKS_RCC							RCC_APB1Periph_TIM5
 #define TICKS_CLKFreq					84000000
-#define TICKS_IRQn						TIM4_IRQn
-#define TICKS_IRQHandler			void TIM4_IRQHandler(void)
+#define TICKS_IRQn						TIM5_IRQn
+#define TICKS_IRQHandler			void TIM5_IRQHandler(void)
 
 //extern volatile u16 ticks;
 //extern volatile u16 seconds;
