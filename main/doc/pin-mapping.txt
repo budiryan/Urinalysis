@@ -1,6 +1,6 @@
 Stepper motor:
-Grey: step pin motor - PA8
-Purple: Dir pin motor - PC9 --> PD4
+Grey: step pin motor --> PA10
+Purple: Dir pin motor --> PD4
 Red: VCC motor
 
 Pump:
