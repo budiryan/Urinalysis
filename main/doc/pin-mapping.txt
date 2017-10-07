@@ -9,14 +9,14 @@ Brown: Step pin pump PA3
 Black: Dir pin pump PA2
 
 Camera:
-D2: PC6
-D3: PC7
-D4: PE0
-D5: PE1
-D6: PE4 --> ganti jadi PC11
-D7: PB6
-D8: PE5
-D9: PE6
+D0 = PC6 
+D1 = PC7 
+D2 = PE0 
+D3 = PE1 
+D4 = PE4 --> Switch to PC11
+D5 = PB6 
+D6 = PE5 
+D7 = PE6 
 HSYNC = PA4 
 VSYNC = PB7 
 XCLK = PC9 
@@ -33,9 +33,9 @@ MOSI: PB5
 MISO: Not Used
 
 Button:
-K0: PE4 -- Tabrakan sama D6 Camera
+K0: PE4 -- Crash D6's Camera
 K1: PE3
 
 LED:
-LED1: PA6 -- Tabrakan PXCLK Camera
+LED1: PA6 -- Crash with PXCLK's Camera --> not used
 LED2: PA7

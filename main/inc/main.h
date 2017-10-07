@@ -29,6 +29,9 @@
 #ifndef __MAIN_H
 #define __MAIN_H
 
+/* FOR COMPLETE PIN MAPPING INFORMATION: GO TO 'doc/pin_mapping.txt'----------*/
+
+
 /* Includes ------------------------------------------------------------------*/
 #include <stdbool.h>
 #include "stm32f4xx.h"
@@ -61,10 +64,8 @@
 #include "tm_stm32f4_ili9341.h"
 #include "tm_stm32f4_spi.h"
 #include "tm_stm32f4_spi_dma.h"
-#include "dcmi_ov9655.h"
-
-
-
+#include "I2C.h"
+#include "OV9655.h"
 
 #endif /* __MAIN_H */
 
