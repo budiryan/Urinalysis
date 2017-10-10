@@ -1074,7 +1074,7 @@ uint8_t DCMI_SingleRandomWrite(uint8_t Device, uint16_t Addr, uint8_t Data)
 uint8_t DCMI_SingleRandomRead(uint8_t Device, uint16_t Addr)
 {
 	unsigned char Recieved_Data=0;
-  I2C_Delay();
+    I2C_Delay();
 	I2C_Start();
 	I2C_SendByte(Device);
 	if(I2C_WaitAck()==0xFF) return(0xFF);
@@ -1083,8 +1083,8 @@ uint8_t DCMI_SingleRandomRead(uint8_t Device, uint16_t Addr)
 	I2C_Stop();
 	I2C_Start();
 	I2C_SendByte(Device+1);
-  if(I2C_WaitAck()==0xFF) return(0xFF);
-	Recieved_Data=I2C_ReceiveByte();
+    if(I2C_WaitAck()==0xFF) return(0xFF);
+	    Recieved_Data=I2C_ReceiveByte();
 	I2C_Stop();
 	return Recieved_Data;
 }
