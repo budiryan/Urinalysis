@@ -1,6 +1,7 @@
 #include "main.h"
 
 static volatile int frame_flag = false;
+static volatile bool capture_cam = false;
 char str[12];
 int counter = 0;
 int counter_2 = 100;
@@ -45,24 +46,37 @@ char * itoa (int value, char *result, int base)
 }
 
 
+void DisplayImage(uint16_t image[ILI9341_PIXEL]){
+    uint32_t count = 0;
+    
+    for (int i = 0 ; i < IMG_COLUMNS; i++){
+        for (int j = 0 ; j < IMG_ROWS; j++){
+            TM_ILI9341_DrawPixel(i, j, frame_buffer[count]);
+            count++;
+        }
+    }
+}
+
+
 int main() {
     /* FOR COMPLETE PIN MAPPING INFORMATION: GO TO 'doc/pin_mapping.txt'----------*/
+    SystemInit();
     u8 switch_motor_running = 0;
     u8 switch_pump_running = 1;
     static volatile u8 current_time = 0;
     STEPPER_DIRECTION current_motor_direction = STEPPER_CW;
     PUMP_DIRECTION current_pump_direction = CW;   
     led_init();			//Initiate LED
-    pump_init();
-    stepper_init();
+    // pump_init();
+    // stepper_init();
     // Stepper motor's speed does not depend on duty cycle of the pwm
 	ticks_init();		//Ticks initialization
     TM_ILI9341_Init();
-    TM_ILI9341_Fill(ILI9341_COLOR_MAGENTA);
+    // TM_ILI9341_Fill(ILI9341_COLOR_MAGENTA);
     TM_ILI9341_Rotate(TM_ILI9341_Orientation_Landscape_1);
     int camera_status;
     camera_status = OV9655_Configuration();
-    button_init();
+    // button_init();
     // TM_ILI9341_Puts(100, 100, itoa(camera_status, str, 16), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
     
     // test: READ CAMERA's MANUFACTURER ID
@@ -72,14 +86,10 @@ int main() {
     int id2 = OV9655_ID.Manufacturer_ID2;
     char id1_str[4];
     char id2_str[4];
-    TM_ILI9341_Puts(0, 20, itoa(id1, id1_str, 16), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
-    TM_ILI9341_Puts(0, 40, itoa(id2, id2_str, 16), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
-    
-    // Enable DCMI
-    DMA_Cmd(DMA2_Stream1, ENABLE);
-    DCMI_Cmd(ENABLE); 
+    // TM_ILI9341_Puts(0, 20, itoa(id1, id1_str, 16), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
+    // TM_ILI9341_Puts(0, 40, itoa(id2, id2_str, 16), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
+
     DCMI_CaptureCmd(ENABLE);
-    LED_OFF(LED_2);
     while(true){
         /*
         if(button_pressed(BUTTON_K0)){
@@ -121,14 +131,15 @@ int main() {
             counter++;
         }
         // TM_ILI9341_Puts(100, 100, itoa(frame_buffer[2000], str, 16), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
-        /*
-        if(frame_flag == 1){
-			TM_ILI9341_Rotate(TM_ILI9341_Orientation_Landscape_1);
-			TM_ILI9341_DisplayImage((uint16_t*) frame_buffer);
-            TM_ILI9341_Puts(100, 100, itoa(frame_flag, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
-			frame_flag = 0;
+        if (capture_cam == true){
+            TM_ILI9341_DisplayImage((uint16_t*) frame_buffer);
+            //DisplayImage((uint16_t*) frame_buffer);
+            capture_cam = false;
+            // TM_ILI9341_Puts(100, 100, itoa(frame_buffer[600], str, 16), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
+            //for (int i = 0 ; i < 100; i++){
+             //   TM_ILI9341_DrawPixel(i, 30, frame_buffer[i]);
+            // }
         }
-        */
     }
 }
 
@@ -149,8 +160,18 @@ void DMA2_Stream1_IRQHandler(void){
         //TM_ILI9341_Puts(120, 200, itoa(counter_2, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
         counter_2++;
         */
-        DCMI_CaptureCmd(ENABLE); 
-        TM_ILI9341_DisplayImage((uint16_t*) frame_buffer);        
+        // DCMI_CaptureCmd(ENABLE); 
+        /*
+        if(counter == 0){
+            LED_ON(LED_2);
+            counter = 1;
+        }
+        else{
+            LED_OFF(LED_2);
+            counter = 0;
+        }
+        */
+        capture_cam = true;      
     }
 }
 

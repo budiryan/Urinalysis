@@ -177,6 +177,10 @@ VCC          3.3V         Positive power supply
 #define ILI9341_HEIGHT       320
 #define ILI9341_PIXEL        76800
 
+#define CAMERA_WIDTH    120
+#define CAMERA_HEIGHT   160
+#define CAMERA_PIXEL    19200
+
 /* Colors */
 #define ILI9341_COLOR_WHITE			0xFFFF
 #define ILI9341_COLOR_BLACK			0x0000
@@ -359,6 +363,12 @@ void TM_ILI9341_DisplayOn(void);
  */
 void TM_ILI9341_DisplayOff(void);
 
+
+/**
+ * @brief   Display captured image from lcd camera
+ * @param   Image buffer retrieved from camera
+ * @retval  None
+ */
 void TM_ILI9341_DisplayImage(uint16_t image[ILI9341_PIXEL]);
 
 /**

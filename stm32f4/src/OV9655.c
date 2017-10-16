@@ -99,7 +99,7 @@ uint8_t OV9655_Configuration(void){
     /* Invert the HRef signal*/
     DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_COM10, 0x08);
     
-        /* OV9655 Camera DCMI setup */
+    /* OV9655 Camera DCMI setup */
     OV9655_DCMI_Configuration();	
 
     return (0x00);
@@ -197,8 +197,6 @@ void OV9655_DCMI_Configuration(void)
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP ;
   GPIO_Init(GPIOA, &GPIO_InitStructure);
-  /*
-  */
   
   // DCMI configuration
   DCMI_InitStructure.DCMI_CaptureMode = DCMI_CaptureMode_Continuous;
@@ -208,22 +206,23 @@ void OV9655_DCMI_Configuration(void)
   DCMI_InitStructure.DCMI_HSPolarity = DCMI_HSPolarity_High;
   DCMI_InitStructure.DCMI_CaptureRate = DCMI_CaptureRate_All_Frame;
   DCMI_InitStructure.DCMI_ExtendedDataMode = DCMI_ExtendedDataMode_8b;
-  
   DCMI_Init(&DCMI_InitStructure);
+  DCMI_Cmd(ENABLE);
 
   // DCMI Interrupts config
   // DCMI_ITConfig(DCMI_IT_VSYNC, ENABLE);
   //DCMI_ITConfig(DCMI_IT_LINE, ENABLE);
-  DCMI_ITConfig(DCMI_IT_FRAME, ENABLE);
+  // DCMI_ITConfig(DCMI_IT_FRAME, ENABLE);
   //DCMI_ITConfig(DCMI_IT_ERR, ENABLE);
   
-  
+  /*
   NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1);
   NVIC_InitStructure.NVIC_IRQChannel = DCMI_IRQn;
   NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
   NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;  
   NVIC_Init(&NVIC_InitStructure);
+  */
   
   
   // Configures the DMA2 to transfer Data from DCMI to the LCD
@@ -235,7 +234,7 @@ void OV9655_DCMI_Configuration(void)
   DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)(&DCMI->DR);
   DMA_InitStructure.DMA_Memory0BaseAddr = (uint32_t)frame_buffer;
   DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralToMemory;
-  DMA_InitStructure.DMA_BufferSize = IMG_ROWS * IMG_COLUMNS; 
+  DMA_InitStructure.DMA_BufferSize = IMG_ROWS * IMG_COLUMNS / 2; 
   // DMA_InitStructure.DMA_BufferSize = IMG_ROWS * IMG_COLUMNS; 
   DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
   DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
@@ -251,15 +250,13 @@ void OV9655_DCMI_Configuration(void)
   DMA_Cmd(DMA2_Stream1, ENABLE);
 
   // DMA interrupt
-  
   DMA_ITConfig(DMA2_Stream1, DMA_IT_TC, ENABLE);
   NVIC_InitStructure.NVIC_IRQChannel = DMA2_Stream1_IRQn;
   NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
   NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
   NVIC_Init(&NVIC_InitStructure);
-  
-  
+  DMA_Cmd(DMA2_Stream1, ENABLE); 
 }
 
 /**
