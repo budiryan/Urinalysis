@@ -38,24 +38,17 @@
 #include "led.h"
 #include "tft_display.h"
 #include "stm32f4xx_gpio.h"
+#include "stm32f4xx_dma2d.h"
 #include "usart.h"
 #include "approx_math.h"
 #include "gyro.h"
-#include "can_protocol.h"
-#include "can_motor.h"
-#include "encoder.h"
 #include "sensor_bar.h"
 #include "line_sensor.h"
 #include "buzzer_song.h"
 #include "buzzer.h"
 #include "infrared_sensor.h"
 #include "ticks.h"
-#include "servo.h"
-#include "ultra_sonic.h"
-#include "bajaj.h"
 #include "button.h"
-#include "ardu_imu.h"
-#include "MTi-1_UART.h"
 #include "pump.h"
 #include "stepper_motor.h"
 #include "tm_stm32f4_gpio.h"
@@ -66,6 +59,8 @@
 #include "tm_stm32f4_spi_dma.h"
 #include "I2C.h"
 #include "OV9655.h"
+// Image buffer
+extern volatile uint32_t frame_buffer[IMG_ROWS * IMG_COLUMNS];
 
 #endif /* __MAIN_H */
 

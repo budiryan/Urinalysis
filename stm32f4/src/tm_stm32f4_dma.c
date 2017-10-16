@@ -274,12 +274,12 @@ void DMA2_Stream0_IRQHandler(void) {
 	TM_DMA_INT_ProcessInterrupt(DMA2_Stream0);
 }
 #endif
-#ifndef DMA2_STREAM1_DISABLE_IRQHANDLER
-void DMA2_Stream1_IRQHandler(void) {
-	/* Call user function */
-	TM_DMA_INT_ProcessInterrupt(DMA2_Stream1);
-}
-#endif
+// #ifndef DMA2_STREAM1_DISABLE_IRQHANDLER
+// void DMA2_Stream1_IRQHandler(void) {
+//	/* Call user function */
+//	TM_DMA_INT_ProcessInterrupt(DMA2_Stream1);
+//}
+// #endif
 #ifndef DMA2_STREAM2_DISABLE_IRQHANDLER
 void DMA2_Stream2_IRQHandler(void) {
 	/* Call user function */

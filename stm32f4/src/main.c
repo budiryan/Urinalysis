@@ -1,11 +1,24 @@
 #include "main.h"
 
-u8 switch_motor_running = 0;
-u8 switch_pump_running = 1;
-STEPPER_DIRECTION current_motor_direction = STEPPER_CW;
-PUMP_DIRECTION current_pump_direction = CW;
+static volatile int frame_flag = false;
+char str[12];
+int counter = 0;
+int counter_2 = 100;
 
-/*Used for Debugging Purposes --> Converts an integer to char array*/
+//Enter capture mode: Take a single image
+void camera_capture(){
+    // Stop DCMI
+    DCMI_CaptureCmd(DISABLE);
+	while(DCMI->CR & 0x01);
+	DMA_Cmd(DMA2_Stream1, DISABLE);
+	DMA_DoubleBufferModeCmd(DMA2_Stream1, DISABLE);
+	
+    DMA_Cmd(DMA2_Stream1, DISABLE);
+	while(DMA2D_GetFlagStatus(DMA2D_FLAG_TC) != RESET); //Wait until current transmission is ok
+	//lcd_frame_transfer_in();
+}
+
+/* Converts an integer to char array */
 char * itoa (int value, char *result, int base)
 {
     // check that the base if valid
@@ -34,7 +47,11 @@ char * itoa (int value, char *result, int base)
 
 int main() {
     /* FOR COMPLETE PIN MAPPING INFORMATION: GO TO 'doc/pin_mapping.txt'----------*/
-    char str[12];    
+    u8 switch_motor_running = 0;
+    u8 switch_pump_running = 1;
+    static volatile u8 current_time = 0;
+    STEPPER_DIRECTION current_motor_direction = STEPPER_CW;
+    PUMP_DIRECTION current_pump_direction = CW;   
     led_init();			//Initiate LED
     pump_init();
     stepper_init();
@@ -42,11 +59,11 @@ int main() {
 	ticks_init();		//Ticks initialization
     TM_ILI9341_Init();
     TM_ILI9341_Fill(ILI9341_COLOR_MAGENTA);
-    TM_ILI9341_Rotate(TM_ILI9341_Orientation_Landscape_2);
+    TM_ILI9341_Rotate(TM_ILI9341_Orientation_Landscape_1);
     int camera_status;
     camera_status = OV9655_Configuration();
     button_init();
-    TM_ILI9341_Puts(100, 100, itoa(camera_status, str, 16), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
+    // TM_ILI9341_Puts(100, 100, itoa(camera_status, str, 16), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
     
     // test: READ CAMERA's MANUFACTURER ID
     OV9655_IDTypeDef OV9655_ID;
@@ -55,12 +72,16 @@ int main() {
     int id2 = OV9655_ID.Manufacturer_ID2;
     char id1_str[4];
     char id2_str[4];
-    TM_ILI9341_Puts(100, 120, itoa(id1, id1_str, 16), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
-    TM_ILI9341_Puts(100, 140, itoa(id2, id2_str, 16), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
+    TM_ILI9341_Puts(0, 20, itoa(id1, id1_str, 16), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
+    TM_ILI9341_Puts(0, 40, itoa(id2, id2_str, 16), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
     
+    // Enable DCMI
+    DMA_Cmd(DMA2_Stream1, ENABLE);
+    DCMI_Cmd(ENABLE); 
+    DCMI_CaptureCmd(ENABLE);
+    LED_OFF(LED_2);
     while(true){
         /*
-        TM_ILI9341_Puts(100, 100, itoa(get_seconds(), str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
         if(button_pressed(BUTTON_K0)){
             current_time = get_full_ticks();
             while(button_pressed(BUTTON_K0));
@@ -69,6 +90,7 @@ int main() {
                 case STEPPER_CW:
                     stepper_spin(current_motor_direction, 200);
                     current_motor_direction = STEPPER_CCW;
+                    
                     break;
                 case STEPPER_CCW:
                     stepper_spin(current_motor_direction, 0);
@@ -93,8 +115,45 @@ int main() {
             }
         }
         */
+        if(button_pressed(BUTTON_K1)){
+            while(button_pressed(BUTTON_K1));
+            LED_ON(LED_2);
+            counter++;
+        }
+        // TM_ILI9341_Puts(100, 100, itoa(frame_buffer[2000], str, 16), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
+        /*
+        if(frame_flag == 1){
+			TM_ILI9341_Rotate(TM_ILI9341_Orientation_Landscape_1);
+			TM_ILI9341_DisplayImage((uint16_t*) frame_buffer);
+            TM_ILI9341_Puts(100, 100, itoa(frame_flag, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
+			frame_flag = 0;
+        }
+        */
     }
-} 
+}
+
+
+void DMA2_Stream1_IRQHandler(void){
+	// DMA complete
+	if(DMA_GetITStatus(DMA2_Stream1,DMA_IT_TCIF1) != RESET){
+		DMA_ClearITPendingBit(DMA2_Stream1,DMA_IT_TCIF1);
+        // TM_ILI9341_Puts(100, 100, itoa(frame_buffer[2000], str, 16), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
+        
+        /*
+        TM_ILI9341_Puts(120, 200, itoa(counter_2, str, 16), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
+        
+        TM_ILI9341_Puts(120, 160, itoa(frame_buffer[counter_2], str, 16), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
+        
+        
+        //TM_ILI9341_Puts(120, 180, "                 ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
+        //TM_ILI9341_Puts(120, 200, itoa(counter_2, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
+        counter_2++;
+        */
+        DCMI_CaptureCmd(ENABLE); 
+        TM_ILI9341_DisplayImage((uint16_t*) frame_buffer);        
+    }
+}
+
 
 
 

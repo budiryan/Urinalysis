@@ -359,6 +359,8 @@ void TM_ILI9341_DisplayOn(void);
  */
 void TM_ILI9341_DisplayOff(void);
 
+void TM_ILI9341_DisplayImage(uint16_t image[ILI9341_PIXEL]);
+
 /**
  * @}
  */

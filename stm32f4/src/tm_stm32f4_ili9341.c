@@ -574,3 +574,25 @@ void TM_ILI9341_DrawFilledCircle(int16_t x0, int16_t y0, int16_t r, uint32_t col
         TM_ILI9341_DrawLine(x0 + y, y0 - x, x0 - y, y0 - x, color);
     }
 }
+
+void TM_ILI9341_DisplayImage(uint16_t image[ILI9341_PIXEL]) {
+	uint32_t n, i, j;
+	
+	// TM_ILI9341_SetCursorPosition(0, 0, ILI9341_Opts.width - 1, ILI9341_Opts.height - 1);
+    TM_ILI9341_SetCursorPosition(0, 0, 160 - 1, 120 - 1);
+
+	TM_ILI9341_SendCommand(ILI9341_GRAM);
+
+	ILI9341_WRX_SET;
+	ILI9341_CS_RESET;
+	
+	for (n = 0; n < ILI9341_PIXEL; n++) {
+		i = image[n] >> 8;
+		j = image[n] & 0xFF;
+				
+		TM_SPI_Send(ILI9341_SPI, i);
+		TM_SPI_Send(ILI9341_SPI, j);
+	}
+	
+	ILI9341_CS_SET;
+}

@@ -53,8 +53,8 @@ void ticks_init(void) {
 	TIM_Cmd(TICKS_TIM, ENABLE);																							 // Counter Enable
 
 	
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_InitStructure.NVIC_IRQChannel = TICKS_IRQn;
 	NVIC_Init(&NVIC_InitStructure);

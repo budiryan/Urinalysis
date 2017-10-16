@@ -46,8 +46,8 @@ typedef struct
 #define OV9655_DEVICE_READ_ADDRESS     0x61
 
 /* Uncomment the line corresponding to the camera resolution */
-//#define QQVGA_SIZE  /*160x120 */
-#define QVGA_SIZE  /* 320x240 */
+#define QQVGA_SIZE  /*160x120 */
+// #define QVGA_SIZE  /* 320x240 */
 
 /* OV9655 Registers definition */
 #define OV9655_GAIN       0x00
@@ -277,6 +277,9 @@ typedef struct
 #define RGB_NORMAL   0x00 
 #define RGB_565      0x10 
 #define RGB_555      0x30 
+
+#define IMG_ROWS    160
+#define IMG_COLUMNS 120
 
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
