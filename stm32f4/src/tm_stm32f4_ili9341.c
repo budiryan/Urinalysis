@@ -576,17 +576,16 @@ void TM_ILI9341_DrawFilledCircle(int16_t x0, int16_t y0, int16_t r, uint32_t col
 }
 
 void TM_ILI9341_DisplayImage(uint16_t image[ILI9341_PIXEL]) {
-	uint32_t n, i, j;
-	uint32_t startX = 50;
-    uint32_t startY = 50;
+	int n, i, j;
+	int startX = 0;
+    int startY = 0;
 	TM_ILI9341_SetCursorPosition(startX, startY, startX + CAMERA_HEIGHT - 1, startY + CAMERA_WIDTH - 1);
-
+    // TM_ILI9341_SetCursorPosition(startX + CAMERA_HEIGHT - 1, startY + CAMERA_WIDTH - 1, startX, startY);
 	TM_ILI9341_SendCommand(ILI9341_GRAM);
 	
-	for (n = 0; n < CAMERA_PIXEL; n++) {
+	for (n = CAMERA_PIXEL - 1; n >= 0; n--) {
 		i = image[n] >> 8;
 		j = image[n] & 0xFF;
-				
 		TM_ILI9341_SendData(i);
 		TM_ILI9341_SendData(j);
 	}

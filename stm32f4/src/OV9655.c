@@ -58,7 +58,7 @@
 			I2C_SDA    = PB9
 */
 
-volatile uint32_t frame_buffer[IMG_ROWS * IMG_COLUMNS];
+volatile uint16_t frame_buffer[IMG_ROWS * IMG_COLUMNS];
 // volatile uint32_t input[IMG_ROWS * IMG_COLUMNS];
 // volatile uint32_t frame_buffer[10];
 // volatile uint32_t input[10];
@@ -70,37 +70,42 @@ volatile uint32_t frame_buffer[IMG_ROWS * IMG_COLUMNS];
 uint8_t OV9655_Configuration(void){
     int i=0;
     OV9655_IDTypeDef OV9655_ID;
-    /*OV9655 MCO Configuration*/
+    // OV9655 MCO Configuration
     OV9655_MCO_Configuration();
-    /* I2C configuration */
+    // I2C configuration
     Soft_I2C_Configuration();
 
     for(i=0;i<10000;i++){}
-    /* Reset and check the presence of the OV9655 camera module */
+    // Reset and check the presence of the OV9655 camera module
     if (DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS,0x12, 0x80)==0xFF)
     {
      return (0xFF); //Camera Failed!
     }
-    /* Camera Ok!*/
+    // Camera Ok!
     for(i=0;i<10000;i++){}
 
     DCMI_OV9655_ReadID(&OV9655_ID);	
         
-    /* OV9655 Camera size setup */    
+    // OV9655 Camera size setup   
     #if defined (QQVGA_SIZE)
         DCMI_OV9655_QQVGASizeSetup();
     #elif defined (QVGA_SIZE)
         DCMI_OV9655_QVGASizeSetup();
     #endif 
-    /* Set the RGB565 mode */
+    // Set the RGB565 mode
     DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_COM7, 0x63);
     DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_COM15, 0xd0);
-
-    /* Invert the HRef signal*/
+        
+    // Invert the HRef signal
     DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_COM10, 0x08);
     
-    /* OV9655 Camera DCMI setup */
-    OV9655_DCMI_Configuration();	
+    // Control gain
+    
+    // OV9655 Camera DCMI setup
+    OV9655_DCMI_Configuration();
+        
+    DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_GAIN, 0x00);
+    DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_BLUE, 0x00);
 
     return (0x00);
 }
@@ -235,7 +240,6 @@ void OV9655_DCMI_Configuration(void)
   DMA_InitStructure.DMA_Memory0BaseAddr = (uint32_t)frame_buffer;
   DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralToMemory;
   DMA_InitStructure.DMA_BufferSize = IMG_ROWS * IMG_COLUMNS / 2; 
-  // DMA_InitStructure.DMA_BufferSize = IMG_ROWS * IMG_COLUMNS; 
   DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
   DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
   DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Word;

@@ -2,7 +2,7 @@
 
 static volatile int frame_flag = false;
 static volatile bool capture_cam = false;
-char str[12];
+char str[40];
 int counter = 0;
 int counter_2 = 100;
 
@@ -50,7 +50,7 @@ int main() {
 	ticks_init();		//Ticks initialization
     TM_ILI9341_Init();
     TM_ILI9341_Fill(ILI9341_COLOR_MAGENTA);
-    TM_ILI9341_Rotate(TM_ILI9341_Orientation_Landscape_1);
+    TM_ILI9341_Rotate(TM_ILI9341_Orientation_Landscape_2);
     int camera_status;
     camera_status = OV9655_Configuration();
     button_init();
@@ -64,6 +64,12 @@ int main() {
     char id2_str[4];
     // TM_ILI9341_Puts(0, 20, itoa(id1, id1_str, 16), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
     // TM_ILI9341_Puts(0, 40, itoa(id2, id2_str, 16), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
+    
+    // Red, green, and blue
+    uint64_t r = 0;
+    uint64_t g = 0; 
+    uint64_t b = 0;
+    float temp;
 
     DCMI_CaptureCmd(DISABLE);
     while(true){
@@ -107,11 +113,40 @@ int main() {
             DCMI_CaptureCmd(ENABLE);
             TM_ILI9341_DisplayImage((uint16_t*) frame_buffer);
             LED_ON(LED_2);
-            _delay_ms(1000);
+            _delay_ms(500);
             DCMI_CaptureCmd(DISABLE);
         }
+        /*
+        if(capture_cam == true){
+            capture_cam = false;
+            TM_ILI9341_DisplayImage((uint16_t*) frame_buffer); 
+        */
         if(button_pressed(BUTTON_K0)){
-            TM_ILI9341_Puts(100, 180, itoa(frame_buffer[2000], str, 16), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);   
+            while(button_pressed(BUTTON_K0));
+            r = 0;
+            g = 0;
+            b = 0;
+            for(int i = 0 ; i < CAMERA_PIXEL; i++){
+                r += ((frame_buffer[i] & 0xF800) >> 11);
+                g += ((frame_buffer[i] & 0x7E0) >> 5);
+                b += (frame_buffer[i] & 0x1F);
+            }
+            r /= ((float)CAMERA_PIXEL);
+            temp = (float)g / (CAMERA_PIXEL);
+            g = (float)temp / 64.0 * 32.0;
+            b /= ((float)CAMERA_PIXEL);
+            TM_ILI9341_Puts(20, 140, "                    ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
+            TM_ILI9341_Puts(20, 160, "                    ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
+            TM_ILI9341_Puts(20, 180, "                    ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
+            TM_ILI9341_Puts(20, 140, itoa((float)r / 32 * 255, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
+            TM_ILI9341_Puts(20, 160, itoa((float)g / 32 * 255, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
+            TM_ILI9341_Puts(20, 180, itoa((float)b / 32 * 255, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
+            /*
+            TM_ILI9341_Puts(0, 140, itoa(frame_buffer[2000], str, 2), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
+            TM_ILI9341_Puts(0, 160, itoa((frame_buffer[2000]& 0xF800) >> 11, str, 2), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
+            TM_ILI9341_Puts(0, 180, itoa((frame_buffer[2000]& 0x7E0) >> 5, str, 2), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
+            TM_ILI9341_Puts(0, 200, itoa(frame_buffer[2000]& 0x1F, str, 2), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
+            */
         }
     }
 }
@@ -121,7 +156,8 @@ int main() {
 void DMA2_Stream1_IRQHandler(void){
 	// DMA complete
 	if(DMA_GetITStatus(DMA2_Stream1,DMA_IT_TCIF1) != RESET){
-		DMA_ClearITPendingBit(DMA2_Stream1,DMA_IT_TCIF1);     
+		DMA_ClearITPendingBit(DMA2_Stream1,DMA_IT_TCIF1);
+        // capture_cam = true;
     }
 }
 

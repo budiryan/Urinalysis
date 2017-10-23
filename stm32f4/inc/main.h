@@ -60,7 +60,7 @@
 #include "I2C.h"
 #include "OV9655.h"
 // Image buffer
-extern volatile uint32_t frame_buffer[IMG_ROWS * IMG_COLUMNS];
+extern volatile uint16_t frame_buffer[IMG_ROWS * IMG_COLUMNS];
 
 #endif /* __MAIN_H */
 
