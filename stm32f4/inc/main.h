@@ -59,8 +59,12 @@
 #include "tm_stm32f4_spi_dma.h"
 #include "I2C.h"
 #include "OV9655.h"
-// Image buffer
-extern volatile uint16_t frame_buffer[IMG_ROWS * IMG_COLUMNS];
+#include "helper.h"
+
+extern volatile uint16_t frame_buffer[CAMERA_ROWS * CAMERA_COLUMNS];
+extern volatile uint16_t segmentation[SEGMENT_ROWS * SEGMENT_COLUMNS];
+
+void init(void);
 
 #endif /* __MAIN_H */
 

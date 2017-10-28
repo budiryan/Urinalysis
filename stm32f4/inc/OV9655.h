@@ -24,6 +24,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx.h"
+#include "helper.h"
 
 /* Exported types ------------------------------------------------------------*/
 typedef struct
@@ -277,9 +278,6 @@ typedef struct
 #define RGB_NORMAL   0x00 
 #define RGB_565      0x10 
 #define RGB_555      0x30 
-
-#define IMG_ROWS    160
-#define IMG_COLUMNS 120
 
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */

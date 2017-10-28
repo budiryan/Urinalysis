@@ -25,6 +25,8 @@
 #include "I2C.h"
 #include "main.h"
 
+volatile uint16_t frame_buffer[CAMERA_ROWS * CAMERA_COLUMNS];
+
 /** @addtogroup DCMI_OV9655_Camera
   * @{
   */
@@ -58,7 +60,6 @@
 			I2C_SDA    = PB9
 */
 
-volatile uint16_t frame_buffer[IMG_ROWS * IMG_COLUMNS];
 // volatile uint32_t input[IMG_ROWS * IMG_COLUMNS];
 // volatile uint32_t frame_buffer[10];
 // volatile uint32_t input[10];
@@ -93,19 +94,24 @@ uint8_t OV9655_Configuration(void){
         DCMI_OV9655_QVGASizeSetup();
     #endif 
     // Set the RGB565 mode
-    DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_COM7, 0x63);
-    DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_COM15, 0xd0);
+    // DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_COM7, 0x63);
+    // DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_COM15, 0xd0);
+    
+    // Set to RGB565 / RGB555 mode
+    DCMI_OV9655_SelectRGBOption(RGB_565);
+    DCMI_OV9655_SelectRGBOption(RGB_565);
         
     // Invert the HRef signal
     DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_COM10, 0x08);
     
     // Control gain
+    // DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_GAIN, 0x00);
+    // DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_BLUE, 0x00);
+    // DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_RED, 0xFF);
+        
     
     // OV9655 Camera DCMI setup
     OV9655_DCMI_Configuration();
-        
-    DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_GAIN, 0x00);
-    DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_BLUE, 0x00);
 
     return (0x00);
 }
@@ -239,7 +245,7 @@ void OV9655_DCMI_Configuration(void)
   DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)(&DCMI->DR);
   DMA_InitStructure.DMA_Memory0BaseAddr = (uint32_t)frame_buffer;
   DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralToMemory;
-  DMA_InitStructure.DMA_BufferSize = IMG_ROWS * IMG_COLUMNS / 2; 
+  DMA_InitStructure.DMA_BufferSize = CAMERA_ROWS * CAMERA_COLUMNS / 2; 
   DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
   DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
   DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Word;
@@ -567,6 +573,14 @@ void DCMI_OV9655_QVGASizeSetup(void)
 //  DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS,0x8e, 0x00);
 //  _delay_ms(TIMEOUT);	
 //  DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS,0x8f, 0x00);
+
+  _delay_ms(TIMEOUT);
+  DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS,0x8d, 0x00);
+  _delay_ms(TIMEOUT);	
+  DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS,0x8e, 0x00);
+  _delay_ms(TIMEOUT);	
+  DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS,0x8f, 0x00);
+
   _delay_ms(TIMEOUT);	
   DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS,0x90, 0x71);
   _delay_ms(TIMEOUT);

@@ -132,6 +132,7 @@ VCC          3.3V         Positive power supply
 #include "tm_stm32f4_spi.h"
 #include "tm_stm32f4_dma.h"
 #include "tm_stm32f4_spi_dma.h"
+#include "helper.h"
 
 /**
  * @defgroup TM_ILI9341_Macros
@@ -176,10 +177,6 @@ VCC          3.3V         Positive power supply
 #define ILI9341_WIDTH        240
 #define ILI9341_HEIGHT       320
 #define ILI9341_PIXEL        76800
-
-#define CAMERA_WIDTH    120
-#define CAMERA_HEIGHT   160
-#define CAMERA_PIXEL    19200
 
 /* Colors */
 #define ILI9341_COLOR_WHITE			0xFFFF

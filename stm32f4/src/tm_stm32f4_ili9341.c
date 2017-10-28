@@ -576,17 +576,34 @@ void TM_ILI9341_DrawFilledCircle(int16_t x0, int16_t y0, int16_t r, uint32_t col
 }
 
 void TM_ILI9341_DisplayImage(uint16_t image[ILI9341_PIXEL]) {
-	int n, i, j;
+	int n_rows, n_columns, i, j, n;
 	int startX = 0;
     int startY = 0;
-	TM_ILI9341_SetCursorPosition(startX, startY, startX + CAMERA_HEIGHT - 1, startY + CAMERA_WIDTH - 1);
-    // TM_ILI9341_SetCursorPosition(startX + CAMERA_HEIGHT - 1, startY + CAMERA_WIDTH - 1, startX, startY);
-	TM_ILI9341_SendCommand(ILI9341_GRAM);
-	
-	for (n = CAMERA_PIXEL - 1; n >= 0; n--) {
-		i = image[n] >> 8;
-		j = image[n] & 0xFF;
-		TM_ILI9341_SendData(i);
-		TM_ILI9341_SendData(j);
+    n = 0;
+    uint16_t cursor_color = 0xF800; //  cursor color
+	TM_ILI9341_SetCursorPosition(startX, startY, startX + CAMERA_COLUMNS - 1, startY + CAMERA_ROWS - 1);
+    TM_ILI9341_SendCommand(ILI9341_GRAM);
+   
+	for (n_rows = 0; n_rows < CAMERA_ROWS; n_rows++) {
+        for (n_columns = 0; n_columns < CAMERA_COLUMNS; n_columns++){
+            // Draw a target cursor
+            if ((n_columns >= START_SEGMENT_COLUMNS) && (n_columns < START_SEGMENT_COLUMNS + SEGMENT_COLUMNS)
+                && (n_rows >= START_SEGMENT_ROWS) && (n_rows < START_SEGMENT_ROWS + SEGMENT_ROWS)){
+                i = cursor_color >> 8;
+                j = cursor_color & 0xFF;
+            }
+            
+            // Otherwise, display the normal image
+            else{
+                i = image[n] >> 8;
+                j = image[n] & 0xFF;
+            }
+            
+            // Send data to the monitor
+            TM_ILI9341_SendData(i);
+            TM_ILI9341_SendData(j);
+            n++;
+        }
+           
 	}
 }
