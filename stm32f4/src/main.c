@@ -3,21 +3,44 @@
 static volatile bool capture_cam = true;
 char str[40];
 bool CONTINUOUS_MODE = true;
+u8 switch_motor_running = 0;
+u8 switch_pump_running = 1;
+static volatile u8 current_time = 0;
+STEPPER_DIRECTION current_motor_direction = STEPPER_CW;
+PUMP_DIRECTION current_pump_direction = CW;
+u16 pump_time_stamp;
+u16 motor_time_stamp;
+
+void begin_rotate_motor(void){
+    TM_ILI9341_Puts(180, 20, "            ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
+    while ((get_seconds() - motor_time_stamp) < PUMP_DURATION){
+        pump(400, CW);
+        TM_ILI9341_Puts(180, 20, "ROTATE", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
+    }
+    // After some second, stop
+    pump(0, CW);
+}
+
+void begin_pump(void){
+    // Pump for some seconds
+    TM_ILI9341_Puts(180, 20, "            ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
+    while ((get_seconds() - pump_time_stamp) < PUMP_DURATION){
+        pump(400, CW);
+        TM_ILI9341_Puts(180, 20, "PUMPING", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
+    }
+    // After some second, stop
+    pump(0, CW);
+}
 
 void init(){
     SystemInit();
-    u8 switch_motor_running = 0;
-    u8 switch_pump_running = 1;
-    static volatile u8 current_time = 0;
-    STEPPER_DIRECTION current_motor_direction = STEPPER_CW;
-    PUMP_DIRECTION current_pump_direction = CW;   
     led_init();			//Initiate LED
     pump_init();
     stepper_init();
     // Stepper motor's speed does not depend on duty cycle of the pwm
 	ticks_init();		//Ticks initialization
     TM_ILI9341_Init();
-    TM_ILI9341_Fill(ILI9341_COLOR_MAGENTA);
+    TM_ILI9341_Fill(ILI9341_COLOR_WHITE);
     TM_ILI9341_Rotate(TM_ILI9341_Orientation_Landscape_2);
     button_init();
     OV9655_Configuration();
@@ -32,41 +55,24 @@ int main() {
     // else
     //    DCMI_CaptureCmd(DISABLE);
     DCMI_CaptureCmd(ENABLE);
+    TM_ILI9341_Puts(180, 0, "Process: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
     while(true){
-        /*
-        if(button_pressed(BUTTON_K0)){
-            current_time = get_full_ticks();
-            while(button_pressed(BUTTON_K0));
-                // CHANGE BOTH DIRECTION AND SPEED
-             switch(current_motor_direction){
-                case STEPPER_CW:
-                    stepper_spin(current_motor_direction, 200);
-                    current_motor_direction = STEPPER_CCW;
-                    
-                    break;
-                case STEPPER_CCW:
-                    stepper_spin(current_motor_direction, 0);
-                    current_motor_direction = STEPPER_CW;
-                    break;
-            }
-        }
+        // TM_ILI9341_Puts(180, 0, "O: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
         if(button_pressed(BUTTON_K1)){
             while(button_pressed(BUTTON_K1));
             // TURN PUMP ON / OFF
-            switch(switch_pump_running){
-                case 0:
-                    pump(400, CW);
-                    LED_ON(LED_2);
-                    switch_pump_running = 1;
-                    break;
-                case 1:
-                    pump(0, CW);
-                    LED_OFF(LED_2);
-                    switch_pump_running = 0;
-                    break;
-            }
+            pump_time_stamp = get_seconds();
+            begin_pump();
+            TM_ILI9341_Puts(180, 20, "DONE PUMPING", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
         }
-        */
+        
+        if(button_pressed(BUTTON_K0)){
+            current_time = get_full_ticks();
+            while(button_pressed(BUTTON_K0));
+            motor_time_stamp = get_seconds();
+            TM_ILI9341_Puts(180, 20, "DONE ROTATE", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
+        }
+        
         /*
         if(button_pressed(BUTTON_K1)){
             // Just capture the picture one time
@@ -80,13 +86,9 @@ int main() {
         
         if(capture_cam == true){
             capture_cam = false;
-            TM_ILI9341_DisplayImage((uint16_t*) frame_buffer);
+            TM_ILI9341_DisplayImage((u16 *) frame_buffer);
             capture_segment();
-            display_color_average((uint16_t*)segmentation, SEGMENT_COLUMNS * SEGMENT_ROWS, RGB565);
-        }
-        
-        if(button_pressed(BUTTON_K0)){
-            while(button_pressed(BUTTON_K0));
+            display_color_average((u16 *)segmentation, SEGMENT_COLUMNS * SEGMENT_ROWS, RGB565);
         }
     }
 }

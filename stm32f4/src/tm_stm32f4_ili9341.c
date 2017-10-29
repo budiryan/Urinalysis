@@ -575,7 +575,7 @@ void TM_ILI9341_DrawFilledCircle(int16_t x0, int16_t y0, int16_t r, uint32_t col
     }
 }
 
-void TM_ILI9341_DisplayImage(uint16_t image[ILI9341_PIXEL]) {
+void TM_ILI9341_DisplayImage(u16 image[ILI9341_PIXEL]) {
 	int n_rows, n_columns, i, j, n;
 	int startX = 0;
     int startY = 0;

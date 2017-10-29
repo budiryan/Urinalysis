@@ -181,7 +181,7 @@ VCC          3.3V         Positive power supply
 /* Colors */
 #define ILI9341_COLOR_WHITE			0xFFFF
 #define ILI9341_COLOR_BLACK			0x0000
-#define ILI9341_COLOR_RED       0xF800
+#define ILI9341_COLOR_RED           0xF800
 #define ILI9341_COLOR_GREEN			0x07E0
 #define ILI9341_COLOR_GREEN2		0xB723
 #define ILI9341_COLOR_BLUE			0x001F
@@ -366,7 +366,7 @@ void TM_ILI9341_DisplayOff(void);
  * @param   Image buffer retrieved from camera
  * @retval  None
  */
-void TM_ILI9341_DisplayImage(uint16_t image[ILI9341_PIXEL]);
+void TM_ILI9341_DisplayImage(u16 image[ILI9341_PIXEL]);
 
 /**
  * @}

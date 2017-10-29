@@ -185,6 +185,7 @@ void USART1_IRQHandler(void)
 		USART_ClearITPendingBit(USART1, USART_IT_RXNE);
 	}
 }
+/*
 void USART2_IRQHandler(void)
 {
 	if(USART_GetITStatus(USART2,USART_IT_RXNE) != RESET)
@@ -194,6 +195,7 @@ void USART2_IRQHandler(void)
 		USART_ClearITPendingBit(USART2, USART_IT_RXNE);
 	}
 }
+*/
 
 /**
   * @brief  Binding of function Printf

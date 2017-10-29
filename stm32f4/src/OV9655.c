@@ -25,7 +25,7 @@
 #include "I2C.h"
 #include "main.h"
 
-volatile uint16_t frame_buffer[CAMERA_ROWS * CAMERA_COLUMNS];
+volatile int frame_buffer[CAMERA_ROWS * CAMERA_COLUMNS];
 
 /** @addtogroup DCMI_OV9655_Camera
   * @{
@@ -70,6 +70,8 @@ volatile uint16_t frame_buffer[CAMERA_ROWS * CAMERA_COLUMNS];
   */
 uint8_t OV9655_Configuration(void){
     int i=0;
+    // Reset all the registers;
+    DCMI_OV9655_Reset();
     OV9655_IDTypeDef OV9655_ID;
     // OV9655 MCO Configuration
     OV9655_MCO_Configuration();
@@ -99,15 +101,14 @@ uint8_t OV9655_Configuration(void){
     
     // Set to RGB565 / RGB555 mode
     DCMI_OV9655_SelectRGBOption(RGB_565);
-    DCMI_OV9655_SelectRGBOption(RGB_565);
         
     // Invert the HRef signal
     DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_COM10, 0x08);
     
     // Control gain
-    // DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_GAIN, 0x00);
-    // DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_BLUE, 0x00);
-    // DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_RED, 0xFF);
+    DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_GAIN, 0);
+    DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_BLUE, 0);
+    DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_RED, 0);
         
     
     // OV9655 Camera DCMI setup
@@ -242,8 +243,8 @@ void OV9655_DCMI_Configuration(void)
   
   DMA_DeInit(DMA2_Stream1);  
   DMA_InitStructure.DMA_Channel = DMA_Channel_1;
-  DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)(&DCMI->DR);
-  DMA_InitStructure.DMA_Memory0BaseAddr = (uint32_t)frame_buffer;
+  DMA_InitStructure.DMA_PeripheralBaseAddr = (int)(&DCMI->DR);
+  DMA_InitStructure.DMA_Memory0BaseAddr = (int)frame_buffer;
   DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralToMemory;
   DMA_InitStructure.DMA_BufferSize = CAMERA_ROWS * CAMERA_COLUMNS / 2; 
   DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;

@@ -60,9 +60,13 @@
 #include "I2C.h"
 #include "OV9655.h"
 #include "helper.h"
+#include "bluetooth_HC05.h"
 
-extern volatile uint16_t frame_buffer[CAMERA_ROWS * CAMERA_COLUMNS];
-extern volatile uint16_t segmentation[SEGMENT_ROWS * SEGMENT_COLUMNS];
+#define PUMP_DURATION 10
+#define MOTOR_DURATION 2
+
+extern volatile int frame_buffer[CAMERA_ROWS * CAMERA_COLUMNS];
+extern volatile int segmentation[SEGMENT_ROWS * SEGMENT_COLUMNS];
 
 void init(void);
 
