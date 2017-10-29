@@ -672,24 +672,9 @@
               <FilePath>.\src\approx_math.c</FilePath>
             </File>
             <File>
-              <FileName>buzzer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\buzzer.c</FilePath>
-            </File>
-            <File>
-              <FileName>buzzer_song.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\buzzer_song.c</FilePath>
-            </File>
-            <File>
               <FileName>led.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\src\led.c</FilePath>
-            </File>
-            <File>
-              <FileName>line_sensor.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\line_sensor.c</FilePath>
             </File>
             <File>
               <FileName>ticks.c</FileName>
@@ -710,21 +695,6 @@
               <FileName>button.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\src\button.c</FilePath>
-            </File>
-            <File>
-              <FileName>imu_math.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\imu_math.c</FilePath>
-            </File>
-            <File>
-              <FileName>adc_ir.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\adc_ir.c</FilePath>
-            </File>
-            <File>
-              <FileName>adc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\adc.c</FilePath>
             </File>
             <File>
               <FileName>pump.c</FileName>
@@ -780,6 +750,11 @@
               <FileName>OV9655.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\inc\OV9655.h</FilePath>
+            </File>
+            <File>
+              <FileName>helper.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\helper.c</FilePath>
             </File>
           </Files>
         </Group>
