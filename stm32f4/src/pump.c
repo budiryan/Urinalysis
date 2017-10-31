@@ -57,7 +57,7 @@ void _pump_step_init(void){
 	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;  	// this part enable the output
 	TIM_OCInitStructure.TIM_OutputNState = TIM_OutputState_Disable; // this part disable the Nstate
 	//------------------------------//
-	TIM_OCInitStructure.TIM_Pulse = 250;    // this part sets the initial CCR value ,CCR = ExpPulseWidth * 1000
+	TIM_OCInitStructure.TIM_Pulse = 0;    // this part sets the initial CCR value ,CCR = ExpPulseWidth * 1000
 	//------------------------------//
 	
 	// OC Init

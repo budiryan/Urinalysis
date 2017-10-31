@@ -604,6 +604,5 @@ void TM_ILI9341_DisplayImage(u16 image[ILI9341_PIXEL]) {
             TM_ILI9341_SendData(j);
             n++;
         }
-           
 	}
 }

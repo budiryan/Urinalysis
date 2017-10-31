@@ -5,7 +5,7 @@ void stepper_init(void){
     _stepper_dir_init();
 }
 
-void stepper_spin(STEPPER_DIRECTION direction, u8 speed){
+void stepper_spin(STEPPER_DIRECTION direction, uint32_t speed){
     // Set dir pin
     switch(direction){
         case STEPPER_CW:
@@ -42,7 +42,7 @@ void _stepper_step_init(void){
 
 	//------------------------------//
 	TIM_TimeBaseStructure.TIM_Prescaler = 167;  //clk=168M/(167+1)=1 MHz, Freq = 1000000 / 400 = 2500Hz
-	TIM_TimeBaseStructure.TIM_Period = 4000;     //pulse cycle= 400 
+	TIM_TimeBaseStructure.TIM_Period = 1000;     //pulse cycle= 400 
 	//------------------------------//
 
 	TIM_TimeBaseInit(STEPPER_STEP_TIM, &TIM_TimeBaseStructure);
@@ -56,7 +56,7 @@ void _stepper_step_init(void){
 	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;  	// this part enable the output
 	TIM_OCInitStructure.TIM_OutputNState = TIM_OutputState_Disable; // this part disable the Nstate
 	//------------------------------//
-	TIM_OCInitStructure.TIM_Pulse = 250;    // this part sets the initial CCR value ,CCR = ExpPulseWidth * 1000
+	TIM_OCInitStructure.TIM_Pulse = 0;    // this part sets the initial CCR value ,CCR = ExpPulseWidth * 1000
 	//------------------------------//
 	
 	// OC Init

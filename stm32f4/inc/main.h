@@ -30,8 +30,6 @@
 #define __MAIN_H
 
 /* FOR COMPLETE PIN MAPPING INFORMATION: GO TO 'doc/pin_mapping.txt'----------*/
-
-
 /* Includes ------------------------------------------------------------------*/
 #include <stdbool.h>
 #include "stm32f4xx.h"
@@ -61,9 +59,6 @@
 #include "OV9655.h"
 #include "helper.h"
 #include "bluetooth_HC05.h"
-
-#define PUMP_DURATION 10
-#define MOTOR_DURATION 2
 
 extern volatile int frame_buffer[CAMERA_ROWS * CAMERA_COLUMNS];
 extern volatile int segmentation[SEGMENT_ROWS * SEGMENT_COLUMNS];

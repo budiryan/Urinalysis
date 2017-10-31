@@ -34,7 +34,7 @@ volatile int frame_buffer[CAMERA_ROWS * CAMERA_COLUMNS];
 /* Private typedef -----------------------------------------------------------*/
    RCC_ClocksTypeDef RCC_Clocks;
 /* Private define ------------------------------------------------------------*/
-   #define  TIMEOUT  2
+   #define  TIMEOUT  10
    #define  DCMI_DR_ADDRESS     0x50050028
    #define  FSMC_LCD_ADDRESS    0x60020000
 /* Bits definitions ----------------------------------------------------------*/
@@ -86,6 +86,8 @@ uint8_t OV9655_Configuration(void){
     }
     // Camera Ok!
     for(i=0;i<10000;i++){}
+        
+        
 
     DCMI_OV9655_ReadID(&OV9655_ID);	
         
@@ -94,25 +96,32 @@ uint8_t OV9655_Configuration(void){
         DCMI_OV9655_QQVGASizeSetup();
     #elif defined (QVGA_SIZE)
         DCMI_OV9655_QVGASizeSetup();
-    #endif 
+    #endif
+        
     // Set the RGB565 mode
     // DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_COM7, 0x63);
     // DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_COM15, 0xd0);
-    
-    // Set to RGB565 / RGB555 mode
-    DCMI_OV9655_SelectRGBOption(RGB_565);
+    DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_COM7, 0x67);
+    DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_COM15, 0xd1);
         
     // Invert the HRef signal
     DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_COM10, 0x08);
+   
+    DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, 0x74, 0x0c);
+    DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, 0x75, 0x0c);
+    DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_COM21, 0x04);
+    DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_COM8, 0xac);
+    DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_COM2, 0x01);
     
-    // Control gain
-    DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_GAIN, 0);
-    DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_BLUE, 0);
-    DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_RED, 0);
-        
-    
+    DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_RED, 0x40);
+    DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_GREEN, 0x40);
+    DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_BLUE, 0x40);
+
     // OV9655 Camera DCMI setup
     OV9655_DCMI_Configuration();
+    // Color test on
+    // DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS,0x8d, 0x00); //color test	on
+	// DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS,0x0c, 0x00); //color test	on
 
     return (0x00);
 }
@@ -168,8 +177,10 @@ void OV9655_DCMI_Configuration(void)
   RCC_AHB2PeriphClockCmd(RCC_AHB2Periph_DCMI, ENABLE);
 
   // Connect DCMI pins to AF13
+  
   // PCLK
   GPIO_PinAFConfig(GPIOA, GPIO_PinSource6, GPIO_AF_DCMI);
+  
   // D0-D7
   GPIO_PinAFConfig(GPIOC, GPIO_PinSource6, GPIO_AF_DCMI);
   GPIO_PinAFConfig(GPIOC, GPIO_PinSource7, GPIO_AF_DCMI);
