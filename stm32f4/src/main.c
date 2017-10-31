@@ -23,9 +23,8 @@ void begin_pump(void){
     TM_ILI9341_Puts(180, 20, "           ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
     TM_ILI9341_Puts(180, 20, "PUMPING", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
     while ((get_seconds() - pump_time_stamp) < PUMP_DURATION){
+        TM_ILI9341_Puts(180, 80, itoa(get_seconds(), str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
         pump(400, CCW);
-        TM_ILI9341_Puts(180, 80, itoa(pump_time_stamp, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
-        TM_ILI9341_Puts(180, 100, itoa(get_seconds(), str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
     }
     // After some second, stop
     pump(0, CCW);
@@ -37,6 +36,7 @@ void clean_pump(void){
     TM_ILI9341_Puts(180, 20, "           ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
     TM_ILI9341_Puts(180, 20, "CLEAN PUMP", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
     while ((get_seconds() - pump_time_stamp) < PUMP_DURATION){
+        TM_ILI9341_Puts(180, 80, itoa(get_seconds(), str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
         pump(400, CW); // only direction is different now...
     }
     // After some second, stop
@@ -49,9 +49,8 @@ void rotate_all_section(void){
     TM_ILI9341_Puts(180, 20, "ROTATING", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
     pump(0, CW);
     while ((get_full_ticks() - motor_time_stamp) < MOTOR_DURATION_MS){
+        TM_ILI9341_Puts(180, 80, itoa(get_seconds(), str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
         stepper_spin(STEPPER_CW, 300);
-        TM_ILI9341_Puts(180, 40, itoa(motor_time_stamp, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
-        TM_ILI9341_Puts(180, 60, itoa(get_full_ticks(), str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
     }
     // After some second, stop
     stepper_spin(STEPPER_CW, 0);
@@ -76,14 +75,19 @@ int main() {
     init();
     /* FOR COMPLETE PIN MAPPING INFORMATION: GO TO 'doc/pin_mapping.txt'----------*/
     DCMI_CaptureCmd(DISABLE);
-    TM_ILI9341_Puts(180, 0, "Process: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
-    TM_ILI9341_Puts(0, 0, "Press K1 to", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
-    TM_ILI9341_Puts(0, 20, "begin analysis", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
+    TM_ILI9341_Puts(180, 0, "STATUS: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
+    TM_ILI9341_Puts(180, 20, "Idle ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
+    TM_ILI9341_Puts(0, 0, "Urinalysis", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
+    TM_ILI9341_Puts(0, 40, "Press K0 to", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
+    TM_ILI9341_Puts(0, 60, "begin operation", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
     while(true){
-        // TM_ILI9341_Puts(180, 0, "O: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
+        TM_ILI9341_Puts(180, 60, "Time: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
+        TM_ILI9341_Puts(180, 80, itoa(get_seconds(), str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
         if(button_pressed(BUTTON_K0)){
             // Analyze the image in 1 press of a button
             while(button_pressed(BUTTON_K0));
+            TM_ILI9341_Puts(0, 40, "                ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+            TM_ILI9341_Puts(0, 60, "                ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
             begin_pump();
             TM_ILI9341_Puts(180, 20, "            ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
             TM_ILI9341_Puts(180, 20, "DONE PUMPING", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
@@ -96,19 +100,17 @@ int main() {
             clean_pump();
             TM_ILI9341_Puts(180, 20, "            ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
             TM_ILI9341_Puts(180, 20, "PUMP CLEAN", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
+            _delay_ms(1000);
+            TM_ILI9341_Puts(180, 20, "            ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
+            DCMI_CaptureCmd(ENABLE);
+            TM_ILI9341_Puts(180, 20, "Analyzing", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
+            _delay_ms(4000);
+            TM_ILI9341_DisplayImage((u16 *) frame_buffer);
+            capture_segment();
+            display_color_average((u16 *)segmentation, SEGMENT_COLUMNS * SEGMENT_ROWS, RGB565);
         }
-        /*
-        if(button_pressed(BUTTON_K1)){
-            // Rotate 1 time
-            while(button_pressed(BUTTON_K0));
-            motor_time_stamp = get_seconds();
-            begin_rotate_motor();
-            TM_ILI9341_Puts(180, 20, "DONE ROTATE", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
-        }
-        */
         
         if(button_pressed(BUTTON_K1)){
-            /*
             // Capture one time and display analysis
             while(button_pressed(BUTTON_K1));
             DCMI_CaptureCmd(ENABLE);
@@ -117,10 +119,6 @@ int main() {
             TM_ILI9341_DisplayImage((u16 *) frame_buffer);
             capture_segment();
             display_color_average((u16 *)segmentation, SEGMENT_COLUMNS * SEGMENT_ROWS, RGB565);
-            */
-            // for (int i  = 0 ; i < ROTATION_COUNT ; i++){
-            //    rotate_all_section();
-            // }
         }
     }
 }
