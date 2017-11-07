@@ -766,6 +766,11 @@
               <FileType>5</FileType>
               <FilePath>.\inc\bluetooth_HC05.h</FilePath>
             </File>
+            <File>
+              <FileName>OV7670_2.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\OV7670_2.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

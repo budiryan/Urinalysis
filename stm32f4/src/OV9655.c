@@ -25,8 +25,6 @@
 #include "I2C.h"
 #include "main.h"
 
-volatile int frame_buffer[CAMERA_ROWS * CAMERA_COLUMNS];
-
 /** @addtogroup DCMI_OV9655_Camera
   * @{
   */

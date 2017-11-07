@@ -56,11 +56,13 @@
 #include "tm_stm32f4_spi.h"
 #include "tm_stm32f4_spi_dma.h"
 #include "I2C.h"
-#include "OV9655.h"
+// #include "OV9655.h"
 #include "helper.h"
 #include "bluetooth_HC05.h"
+#include "OV7670_2.h"
+#include "sccb_config.h"
 
-extern volatile int frame_buffer[CAMERA_ROWS * CAMERA_COLUMNS];
+extern volatile uint16_t frame_buffer[CAMERA_ROWS * CAMERA_COLUMNS];
 extern volatile int segmentation[SEGMENT_ROWS * SEGMENT_COLUMNS];
 
 void init(void);

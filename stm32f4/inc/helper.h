@@ -6,8 +6,8 @@
 #include "OV9655.h"
 #include "ticks.h"
 
-#define CAMERA_COLUMNS          160
-#define CAMERA_ROWS             120
+#define CAMERA_COLUMNS          176
+#define CAMERA_ROWS             144
 #define START_SEGMENT_ROWS      83
 #define START_SEGMENT_COLUMNS   52
 #define SEGMENT_ROWS            10

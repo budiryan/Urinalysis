@@ -72,6 +72,7 @@ uint8_t I2C_Start(void)
 
 void I2C_Stop(void)
 {
+ I2C_Delay();
  SDAL;
  I2C_Delay();
  SCLH;
