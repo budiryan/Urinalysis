@@ -109,7 +109,7 @@ void display_color_average(u16 image[], u16 array_length, COLOR_TYPE color){
     */
     
     TM_ILI9341_Puts(0, 180, "Analyzed paper color:", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
-    TM_ILI9341_DrawFilledRectangle(0, 200, 180, 220, overall);
+    TM_ILI9341_DrawFilledRectangle(0, 200, 20, 220, overall);
 }
 
 /* Move the array from frame buffer to the segmented array, defined on the top of this file */

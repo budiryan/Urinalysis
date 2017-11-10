@@ -227,6 +227,8 @@ typedef enum {
  * @{
  */
 
+void LCD_SPI_BaudRateUp(void);
+
 /**
  * @brief  Initializes ILI9341 LCD with LTDC peripheral
  *         It also initializes external SDRAM

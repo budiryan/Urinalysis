@@ -351,7 +351,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>4</Optim>
+            <Optim>3</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -770,6 +770,21 @@
               <FileName>OV7670_2.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\src\OV7670_2.c</FilePath>
+            </File>
+            <File>
+              <FileName>tm_stm32f4_delay.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\tm_stm32f4_delay.c</FilePath>
+            </File>
+            <File>
+              <FileName>tm_stm32f4_timer_properties.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\tm_stm32f4_timer_properties.c</FilePath>
+            </File>
+            <File>
+              <FileName>tm_stm32f4_delay.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\tm_stm32f4_delay.h</FilePath>
             </File>
           </Files>
         </Group>

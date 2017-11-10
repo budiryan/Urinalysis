@@ -63,7 +63,8 @@ void init(){
     pump_init();
     stepper_init();
     // Stepper motor's speed does not depend on duty cycle of the pwm
-	ticks_init();		//Ticks initialization
+	ticks_init();		//Ticks initialization --> to get seconds etc
+    TM_DELAY_Init();    // Special Library for Delays
     TM_ILI9341_Init();
     TM_ILI9341_Fill(ILI9341_COLOR_WHITE);
     TM_ILI9341_Rotate(TM_ILI9341_Orientation_Landscape_2);
@@ -75,7 +76,9 @@ void init(){
 int main() {
     init();
     /* FOR COMPLETE PIN MAPPING INFORMATION: GO TO 'doc/pin_mapping.txt'----------*/
-    int status = OV7670_Init();
+    int camera_status = OV9655_Configuration();
+    // int status = 0;
+    // LCD_SPI_BaudRateUp();
     DCMI_CaptureCmd(ENABLE);
     /*
     TM_ILI9341_Puts(180, 0, "STATUS: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
@@ -85,17 +88,17 @@ int main() {
     TM_ILI9341_Puts(0, 60, "begin operation", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
     
     */
-    TM_ILI9341_Puts(0, 160, "Status Final: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
     while(true){
-        TM_ILI9341_Puts(0, 140, itoa(get_seconds(), str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
-        TM_ILI9341_Puts(0, 180, itoa(status, str, 16), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
-        
-        if (capture_cam == true){
-            TM_ILI9341_DisplayImage((u16 *) frame_buffer);
-            capture_cam = false;
+        // TM_ILI9341_Puts(0, 200, itoa(get_seconds(), str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
+        /*
+        if (capture_cam == true) {
+
+             TM_ILI9341_DisplayImage((u16 *) frame_buffer);
+             capture_segment();
+             display_color_average((u16 *)segmentation, SEGMENT_COLUMNS * SEGMENT_ROWS, RGB565);
+             capture_cam = false;
         }
-        
-        
+        */
         /*
         if(button_pressed(BUTTON_K0)){
             // Analyze the image in 1 press of a button
@@ -123,18 +126,20 @@ int main() {
             capture_segment();
             display_color_average((u16 *)segmentation, SEGMENT_COLUMNS * SEGMENT_ROWS, RGB565);
         }
-        
+        */
         if(button_pressed(BUTTON_K1)){
             // Capture one time and display analysis
             while(button_pressed(BUTTON_K1));
             DCMI_CaptureCmd(ENABLE);
             TM_ILI9341_Puts(180, 20, "Analyzing", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
-            _delay_ms(4000);
+            Delayms(1000);
             TM_ILI9341_DisplayImage((u16 *) frame_buffer);
             capture_segment();
             display_color_average((u16 *)segmentation, SEGMENT_COLUMNS * SEGMENT_ROWS, RGB565);
+            Delayms(1000);
+            DCMI_CaptureCmd(DISABLE);
         }
-        */
+        
     }
 }
 
@@ -145,8 +150,6 @@ void DMA2_Stream1_IRQHandler(void){
         // Controlling the camera's gain
 		DMA_ClearITPendingBit(DMA2_Stream1,DMA_IT_TCIF1);
         capture_cam = true;
-        count += 1;
-        // TM_ILI9341_Puts(0, 220, itoa(count, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
     }
 }
 

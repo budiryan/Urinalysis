@@ -575,7 +575,7 @@ void TM_ILI9341_DrawFilledCircle(int16_t x0, int16_t y0, int16_t r, uint32_t col
     }
 }
 
-/*
+
 void TM_ILI9341_DisplayImage(u16 image[ILI9341_PIXEL]) {
 	int n_rows, n_columns, i, j, n;
 	int startX = 0;
@@ -588,17 +588,17 @@ void TM_ILI9341_DisplayImage(u16 image[ILI9341_PIXEL]) {
 	for (n_rows = 0; n_rows < CAMERA_ROWS; n_rows++) {
         for (n_columns = 0; n_columns < CAMERA_COLUMNS; n_columns++){
             // Draw a target cursor
-            // if ((n_columns >= START_SEGMENT_COLUMNS) && (n_columns < START_SEGMENT_COLUMNS + SEGMENT_COLUMNS)
-            //     && (n_rows >= START_SEGMENT_ROWS) && (n_rows < START_SEGMENT_ROWS + SEGMENT_ROWS)){
-            //     i = cursor_color >> 8;
-            //     j = cursor_color & 0xFF;
-            // }
+            if ((n_columns >= START_SEGMENT_COLUMNS) && (n_columns < START_SEGMENT_COLUMNS + SEGMENT_COLUMNS)
+                 && (n_rows >= START_SEGMENT_ROWS) && (n_rows < START_SEGMENT_ROWS + SEGMENT_ROWS)){
+                 i = cursor_color >> 8;
+                 j = cursor_color & 0xFF;
+            }
             
             // Otherwise, display the normal image
-            //else{
+            else{
                 i = image[n] >> 8;
                 j = image[n] & 0xFF;
-            // }
+            }
             
             // Send data to the monitor
             TM_ILI9341_SendData(i);
@@ -607,9 +607,12 @@ void TM_ILI9341_DisplayImage(u16 image[ILI9341_PIXEL]) {
         }
 	}
 }
-*/
 
 
+
+
+
+/*
 void TM_ILI9341_DisplayImage(uint16_t image[ILI9341_PIXEL]) {
 	uint32_t n, i, j;
     int startX = 0;
@@ -628,3 +631,24 @@ void TM_ILI9341_DisplayImage(uint16_t image[ILI9341_PIXEL]) {
 	}
 }
 
+
+void LCD_SPI_BaudRateUp(void){
+	SPI_InitTypeDef SPI_InitStruct;
+	
+	SPI_Cmd(SPI5, DISABLE);
+	
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI5, ENABLE);
+
+	SPI_StructInit(&SPI_InitStruct);
+	SPI_InitStruct.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_2;
+	SPI_InitStruct.SPI_DataSize = SPI_DataSize_8b;
+	SPI_InitStruct.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
+	SPI_InitStruct.SPI_FirstBit = SPI_FirstBit_MSB;
+	SPI_InitStruct.SPI_Mode = SPI_Mode_Master;	
+	SPI_InitStruct.SPI_CPOL = SPI_CPOL_Low;
+	SPI_InitStruct.SPI_CPHA = SPI_CPHA_1Edge;
+	SPI_InitStruct.SPI_NSS = SPI_NSS_Soft;
+	SPI_Init(SPI5, &SPI_InitStruct);
+	SPI_Cmd(SPI5, ENABLE);
+}
+*/
