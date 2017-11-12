@@ -17,6 +17,9 @@
  * |----------------------------------------------------------------------
  */
 #include "tm_stm32f4_ili9341.h"
+extern volatile u16 segmentation[SEGMENT_ROWS * SEGMENT_COLUMNS];
+extern volatile u16 frame_buffer[CAMERA_ROWS * CAMERA_COLUMNS];
+
 
 /**
  * @brief  Orientation
@@ -581,6 +584,7 @@ void TM_ILI9341_DisplayImage(u16 image[ILI9341_PIXEL]) {
 	int startX = 0;
     int startY = 0;
     n = 0;
+    int n_segment = 0;
     uint16_t cursor_color = 0xF800; //  cursor color
 	TM_ILI9341_SetCursorPosition(startX, startY, startX + CAMERA_COLUMNS - 1, startY + CAMERA_ROWS - 1);
     TM_ILI9341_SendCommand(ILI9341_GRAM);
@@ -592,6 +596,8 @@ void TM_ILI9341_DisplayImage(u16 image[ILI9341_PIXEL]) {
                  && (n_rows >= START_SEGMENT_ROWS) && (n_rows < START_SEGMENT_ROWS + SEGMENT_ROWS)){
                  i = cursor_color >> 8;
                  j = cursor_color & 0xFF;
+                 segmentation[n_segment] = frame_buffer[n];
+                 n_segment++;
             }
             
             // Otherwise, display the normal image

@@ -32,7 +32,7 @@
 /* Private typedef -----------------------------------------------------------*/
    RCC_ClocksTypeDef RCC_Clocks;
 /* Private define ------------------------------------------------------------*/
-   #define  TIMEOUT  20
+   #define  TIMEOUT  2
    #define  DCMI_DR_ADDRESS     0x50050028
    #define  FSMC_LCD_ADDRESS    0x60020000
 /* Bits definitions ----------------------------------------------------------*/
@@ -97,8 +97,8 @@ uint8_t OV9655_Configuration(void){
     #endif
         
     // Set the RGB565 mode
-  DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_COM7, 0x63);
-  DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_COM15, 0x10);
+    DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_COM7, 0x63);
+    DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_COM15, 0x10);
     //DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_COM7, 0x67);
     //DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_COM15, 0xd1);
         
@@ -121,6 +121,10 @@ uint8_t OV9655_Configuration(void){
     // Color test on
     // DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS,0x8d, 0x00); //color test	on
 	// DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS,0x0c, 0x00); //color test	on
+    // Adjust brightness of the image
+    DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS,0x55, 0xAF);
+    DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS,0x41, 0x43);
+    DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS,0x56, 0x3A);
 
     return (0x00);
 }

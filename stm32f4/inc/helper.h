@@ -8,10 +8,10 @@
 
 #define CAMERA_COLUMNS          160
 #define CAMERA_ROWS             120
-#define START_SEGMENT_ROWS      83
+#define START_SEGMENT_ROWS      82
 #define START_SEGMENT_COLUMNS   52
-#define SEGMENT_ROWS            10
-#define SEGMENT_COLUMNS         10
+#define SEGMENT_ROWS            5
+#define SEGMENT_COLUMNS         5
 #define CAMERA_PIXEL            19200
 
 

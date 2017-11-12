@@ -69,7 +69,8 @@ void init(){
     TM_ILI9341_Fill(ILI9341_COLOR_WHITE);
     TM_ILI9341_Rotate(TM_ILI9341_Orientation_Landscape_2);
     button_init();
-    // OV9655_Configuration();
+    pump(400, CCW);
+    stepper_spin(STEPPER_CW, 300);
 }
 
 
@@ -79,7 +80,7 @@ int main() {
     int camera_status = OV9655_Configuration();
     // int status = 0;
     // LCD_SPI_BaudRateUp();
-    DCMI_CaptureCmd(ENABLE);
+    TM_ILI9341_Puts(0, 0, "Init camera OK!", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
     /*
     TM_ILI9341_Puts(180, 0, "STATUS: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
     TM_ILI9341_Puts(180, 20, "Idle ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
@@ -88,17 +89,16 @@ int main() {
     TM_ILI9341_Puts(0, 60, "begin operation", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
     
     */
+    DCMI_CaptureCmd(ENABLE);
     while(true){
         // TM_ILI9341_Puts(0, 200, itoa(get_seconds(), str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
-        /*
+        
         if (capture_cam == true) {
-
-             TM_ILI9341_DisplayImage((u16 *) frame_buffer);
-             capture_segment();
-             display_color_average((u16 *)segmentation, SEGMENT_COLUMNS * SEGMENT_ROWS, RGB565);
              capture_cam = false;
+             TM_ILI9341_DisplayImage((u16 *) frame_buffer);
+             display_color_average((u16 *)segmentation, SEGMENT_COLUMNS * SEGMENT_ROWS, RGB565);
         }
-        */
+        
         /*
         if(button_pressed(BUTTON_K0)){
             // Analyze the image in 1 press of a button
@@ -127,18 +127,19 @@ int main() {
             display_color_average((u16 *)segmentation, SEGMENT_COLUMNS * SEGMENT_ROWS, RGB565);
         }
         */
+        /*
         if(button_pressed(BUTTON_K1)){
             // Capture one time and display analysis
             while(button_pressed(BUTTON_K1));
             DCMI_CaptureCmd(ENABLE);
             TM_ILI9341_Puts(180, 20, "Analyzing", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
-            Delayms(1000);
+            Delayms(2000);
             TM_ILI9341_DisplayImage((u16 *) frame_buffer);
             capture_segment();
             display_color_average((u16 *)segmentation, SEGMENT_COLUMNS * SEGMENT_ROWS, RGB565);
-            Delayms(1000);
             DCMI_CaptureCmd(DISABLE);
         }
+        */
         
     }
 }
