@@ -91,8 +91,6 @@ int main() {
     */
     DCMI_CaptureCmd(ENABLE);
     while(true){
-        // TM_ILI9341_Puts(0, 200, itoa(get_seconds(), str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
-        
         if (capture_cam == true) {
              capture_cam = false;
              TM_ILI9341_DisplayImage((u16 *) frame_buffer);
