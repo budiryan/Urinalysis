@@ -79,8 +79,9 @@ int main() {
     /* FOR COMPLETE PIN MAPPING INFORMATION: GO TO 'doc/pin_mapping.txt'----------*/
     int camera_status = OV9655_Configuration();
     // int status = 0;
-    // LCD_SPI_BaudRateUp();
     TM_ILI9341_Puts(0, 0, "Init camera OK!", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
+    TM_ILI9341_Puts(0, 0, "               ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    TM_ILI9341_Puts(0, 0, "Live Feed:", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_ORANGE);
     /*
     TM_ILI9341_Puts(180, 0, "STATUS: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
     TM_ILI9341_Puts(180, 20, "Idle ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
@@ -94,7 +95,6 @@ int main() {
         if (capture_cam == true) {
              capture_cam = false;
              TM_ILI9341_DisplayImage((u16 *) frame_buffer);
-             display_color_average((u16 *)segmentation, SEGMENT_COLUMNS * SEGMENT_ROWS, RGB565);
         }
         
         /*
@@ -125,19 +125,17 @@ int main() {
             display_color_average((u16 *)segmentation, SEGMENT_COLUMNS * SEGMENT_ROWS, RGB565);
         }
         */
-        /*
+        
         if(button_pressed(BUTTON_K1)){
             // Capture one time and display analysis
             while(button_pressed(BUTTON_K1));
-            DCMI_CaptureCmd(ENABLE);
+            DCMI_CaptureCmd(DISABLE);
             TM_ILI9341_Puts(180, 20, "Analyzing", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
             Delayms(2000);
-            TM_ILI9341_DisplayImage((u16 *) frame_buffer);
-            capture_segment();
-            display_color_average((u16 *)segmentation, SEGMENT_COLUMNS * SEGMENT_ROWS, RGB565);
-            DCMI_CaptureCmd(DISABLE);
+            display_color_average((u16 *)segmentation, 25, RGB565);
+            TM_ILI9341_Puts(180, 20, "         ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
+            DCMI_CaptureCmd(ENABLE);
         }
-        */
         
     }
 }
@@ -148,6 +146,7 @@ void DMA2_Stream1_IRQHandler(void){
 	if(DMA_GetITStatus(DMA2_Stream1,DMA_IT_TCIF1) != RESET){
         // Controlling the camera's gain
 		DMA_ClearITPendingBit(DMA2_Stream1,DMA_IT_TCIF1);
+        DMA_Cmd(DMA2_Stream1, ENABLE);
         capture_cam = true;
     }
 }

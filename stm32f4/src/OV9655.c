@@ -123,8 +123,9 @@ uint8_t OV9655_Configuration(void){
 	// DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS,0x0c, 0x00); //color test	on
     // Adjust brightness of the image
     DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS,0x55, 0xAF);
-    DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS,0x41, 0x43);
-    DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS,0x56, 0x3A);
+    // DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS,0x41, 0x43);
+    // Contrast settings
+    // DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS,0x56, 0x3A);
 
     return (0x00);
 }

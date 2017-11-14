@@ -786,6 +786,56 @@
               <FileType>5</FileType>
               <FilePath>.\inc\tm_stm32f4_delay.h</FilePath>
             </File>
+            <File>
+              <FileName>tm_stm32f4_fatfs.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\tm_stm32f4_fatfs.c</FilePath>
+            </File>
+            <File>
+              <FileName>ff.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\ff.c</FilePath>
+            </File>
+            <File>
+              <FileName>diskio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\diskio.c</FilePath>
+            </File>
+            <File>
+              <FileName>unicode.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\unicode.c</FilePath>
+            </File>
+            <File>
+              <FileName>syscall.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\syscall.c</FilePath>
+            </File>
+            <File>
+              <FileName>fatfs_sd_sdio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\fatfs_sd_sdio.c</FilePath>
+            </File>
+            <File>
+              <FileName>ffconf.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\ffconf.h</FilePath>
+            </File>
+            <File>
+              <FileName>integer.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\integer.h</FilePath>
+            </File>
+            <File>
+              <FileName>ff.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\ff.h</FilePath>
+            </File>
+            <File>
+              <FileName>ccsbcs.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\ccsbcs.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

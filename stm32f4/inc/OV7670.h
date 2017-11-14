@@ -34,6 +34,9 @@
 *	==========================================================================
 */
 
+#ifndef __OV7670
+#define __OV7670
+
 // Includes
 #include "stm32f4xx.h"
 #include "stm32f4xx_rcc.h"
@@ -84,3 +87,4 @@ extern void DCMI_DMA_init(void);
 
 
 int OV7670_init_new(void);
+#endif
