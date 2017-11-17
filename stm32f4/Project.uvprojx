@@ -831,11 +831,6 @@
               <FileType>5</FileType>
               <FilePath>.\inc\ff.h</FilePath>
             </File>
-            <File>
-              <FileName>ccsbcs.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\ccsbcs.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>

@@ -5,11 +5,12 @@
 #include "tm_stm32f4_ili9341.h"
 #include "OV9655.h"
 #include "ticks.h"
+#include "approx_math.h"
 
 #define CAMERA_COLUMNS          160
 #define CAMERA_ROWS             120
-#define START_SEGMENT_ROWS      61
-#define START_SEGMENT_COLUMNS   57
+#define START_SEGMENT_ROWS      40
+#define START_SEGMENT_COLUMNS   75
 #define SEGMENT_ROWS            5
 #define SEGMENT_COLUMNS         5
 #define CAMERA_PIXEL            19200

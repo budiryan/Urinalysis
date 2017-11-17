@@ -37,12 +37,34 @@ void display_color_average(u16 image[], u16 array_length, COLOR_TYPE color){
     uint64_t overall = 0;
     
     // Reference colors
-    uint64_t glucose_neg = 0xFFC0;
-    uint64_t glucose_normal = 0x8645;
-    uint64_t glucose_50 = 0x056B;
-    uint64_t glucose_150 = 0x044E;
-    uint64_t glucose_500 = 0x12EB;
-    uint64_t glucose_1000 = 0x2228;
+    //uint16_t glucose_neg = 0xFFAF;
+     uint16_t glucose_neg = 0x8645;
+    // uint64_t glucose_normal = 0x8645;
+    // uint64_t glucose_50 = 0x056B;
+    // uint64_t glucose_150 = 0x044E;
+    // uint64_t glucose_500 = 0x12EB;
+    uint16_t glucose_1000 = 0x2228;
+    
+    uint16_t glucose_neg_r = (glucose_neg & 0xF800) >> 11;
+    uint16_t glucose_neg_g = (glucose_neg & 0x7E0) >> 5;
+    glucose_neg_g = glucose_neg_g / (float)64.0 * (float)32.0;
+    uint16_t glucose_neg_b = glucose_neg & 0x1F;
+    
+    uint16_t glucose_1000_r = (glucose_1000 & 0xF800) >> 11;
+    uint16_t glucose_1000_g = (glucose_1000 & 0x7E0) >> 5;
+    glucose_1000_g = glucose_1000_g / (float)64.0 * (float)32.0;
+    uint16_t glucose_1000_b = glucose_1000 & 0x1F;
+    
+    int32_t diff_neg_r;
+    int32_t diff_neg_g;
+    int32_t diff_neg_b;
+    int32_t diff_neg;
+    
+    int32_t diff_1000_r;
+    int32_t diff_1000_g;
+    int32_t diff_1000_b;
+    int32_t diff_1000;
+    int32_t glucose_detected = 0;
     
     char str[40];
     switch(color){
@@ -76,18 +98,56 @@ void display_color_average(u16 image[], u16 array_length, COLOR_TYPE color){
         break;
     }
     
-    TM_ILI9341_Puts(0, 140, "               ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
-    TM_ILI9341_Puts(0, 160, "               ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
-    TM_ILI9341_Puts(0, 180, "               ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
-    TM_ILI9341_Puts(0, 140, "R: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
-    TM_ILI9341_Puts(0, 160, "G: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
-    TM_ILI9341_Puts(0, 180, "B: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
+    // Calculate the euclidean distance for negative glucose
+    diff_neg_r = r - glucose_neg_r;
+    diff_neg_g = g - glucose_neg_g;
+    diff_neg_b = b - glucose_neg_b;
+    diff_neg = Sqrt(Sqr(diff_neg_r) + Sqr(diff_neg_g) + Sqr(diff_neg_b));
     
-    TM_ILI9341_Puts(20, 140, itoa(r, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
-    TM_ILI9341_Puts(20, 160, itoa(g, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
-    TM_ILI9341_Puts(20, 180, itoa(b, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
-    TM_ILI9341_Puts(0, 200, "Analyzed paper color:", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
+    // Calculate the euclidean distance for positive glucose
+    diff_1000_r = r - glucose_1000_r;
+    diff_1000_g = g - glucose_1000_g;
+    diff_1000_b = b - glucose_1000_b;
+    diff_1000 = Sqrt(Sqr(diff_1000_r) + Sqr(diff_1000_g) + Sqr(diff_1000_b));
+    
+    TM_ILI9341_Puts(0, 140, "               ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    TM_ILI9341_Puts(0, 160, "               ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    TM_ILI9341_Puts(0, 180, "               ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    TM_ILI9341_Puts(0, 140, "R: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    TM_ILI9341_Puts(0, 160, "G: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    TM_ILI9341_Puts(0, 180, "B: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    
+    TM_ILI9341_Puts(20, 140, itoa(r, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    TM_ILI9341_Puts(20, 160, itoa(g, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    TM_ILI9341_Puts(20, 180, itoa(b, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    
+    TM_ILI9341_Puts(0, 200, "Analyzed paper color:", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     TM_ILI9341_DrawFilledRectangle(0, 220, 20, 240, overall);
+    
+    TM_ILI9341_Puts(180, 100, "           ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    TM_ILI9341_Puts(180, 120, "           ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    
+    /*
+    TM_ILI9341_Puts(180, 0, itoa(diff_neg, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    TM_ILI9341_Puts(180, 20, itoa(diff_1000, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    
+    
+    TM_ILI9341_Puts(180, 40, itoa(glucose_neg_r, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    TM_ILI9341_Puts(180, 60, itoa(glucose_neg_g, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    TM_ILI9341_Puts(180, 80, itoa(glucose_neg_b, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    
+    TM_ILI9341_Puts(180, 120, itoa(glucose_1000_r, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    TM_ILI9341_Puts(180, 140, itoa(glucose_1000_g, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    TM_ILI9341_Puts(180, 160, itoa(glucose_1000_b, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    */
+    TM_ILI9341_Puts(180, 100, "Result: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    if (diff_neg < diff_1000){
+        TM_ILI9341_Puts(180, 120, "No glucose", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    }
+    else if (diff_neg > diff_1000){
+        TM_ILI9341_Puts(180, 120, "glucose", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    }
+    
 }
 
 /* Move the array from frame buffer to the segmented array, defined on the top of this file */

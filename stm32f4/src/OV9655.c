@@ -190,7 +190,7 @@ void OV9655_DCMI_Configuration(void)
   GPIO_PinAFConfig(GPIOC, GPIO_PinSource7, GPIO_AF_DCMI);
   GPIO_PinAFConfig(GPIOE, GPIO_PinSource0, GPIO_AF_DCMI);
   GPIO_PinAFConfig(GPIOE, GPIO_PinSource1, GPIO_AF_DCMI);
-  GPIO_PinAFConfig(GPIOE, GPIO_PinSource4, GPIO_AF_DCMI);
+  GPIO_PinAFConfig(GPIOC, GPIO_PinSource11, GPIO_AF_DCMI);
   GPIO_PinAFConfig(GPIOB, GPIO_PinSource6, GPIO_AF_DCMI);
   GPIO_PinAFConfig(GPIOE, GPIO_PinSource5, GPIO_AF_DCMI);
   GPIO_PinAFConfig(GPIOE, GPIO_PinSource6, GPIO_AF_DCMI);
@@ -200,17 +200,17 @@ void OV9655_DCMI_Configuration(void)
   GPIO_PinAFConfig(GPIOA, GPIO_PinSource4, GPIO_AF_DCMI);
   
   // DCMI GPIO configuration
-  // D0 D1(PC6/7)
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7;
+  // D0 D1(PC6/7/11)
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7 |GPIO_Pin_11;
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP ;  
   GPIO_Init(GPIOC, &GPIO_InitStructure);
 
-  // D2..D4(PE0/1/4) D6/D7(PE5/6)
+  // D2..D4(PE0/1) D6/D7(PE5/6)
   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 
-	                              | GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_6;
+	                              | GPIO_Pin_5 | GPIO_Pin_6;
   GPIO_Init(GPIOE, &GPIO_InitStructure);
 
   // D5(PB6), VSYNC(PB7)
