@@ -25,5 +25,8 @@ s32 Abs(s32 v);
 s32 s_Abs (s32 v);
 s32 Sqr (s32 x);
 u32 Sqrt(u32 num);
-
+float largest_value(float numbers[], int size);
+int largest_arg(float numbers[], int size);
+float smallest_value(float numbers[], int size);
+int smallest_arg(float numbers[], int size);
 #endif		/*  __APPROX_MATH_H */

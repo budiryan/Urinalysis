@@ -14,12 +14,12 @@
 
 // Step pin: Step pin: PA8
 #define STEPPER_STEP_TIM			   TIM1
-#define STEPPER_STEP_TIM_CHANNEL       TIM_Channel_3
+#define STEPPER_STEP_TIM_CHANNEL       TIM_Channel_1
 #define STEPPER_STEP_AF_TIM 		   GPIO_AF_TIM1
 #define STEPPER_STEP_TIM_RCC		   RCC_APB2Periph_TIM1
 #define STEPPER_STEP_GPIO              GPIOA
-#define STEPPER_STEP_GPIO_PIN          GPIO_Pin_10
-#define STEPPER_STEP_GPIO_PINSOURCE    GPIO_PinSource10
+#define STEPPER_STEP_GPIO_PIN          GPIO_Pin_8
+#define STEPPER_STEP_GPIO_PINSOURCE    GPIO_PinSource8
 #define STEPPER_STEP_GPIO_RCC	       RCC_AHB1Periph_GPIOA
 
 typedef enum {

@@ -16,7 +16,7 @@ void stepper_spin(STEPPER_DIRECTION direction, uint32_t speed){
             break;
     }
     // Set step pwm
-    TIM_SetCompare3(STEPPER_STEP_TIM, speed);
+    TIM_SetCompare1(STEPPER_STEP_TIM, speed);
 }
 
 // Default PWM frequency for Step pin is: 2500 hz
@@ -63,8 +63,8 @@ void _stepper_step_init(void){
 	TIM_OCInitStructure.TIM_Pulse = 0;
 	
 	// OC Init
-	TIM_OC3Init(STEPPER_STEP_TIM, &TIM_OCInitStructure);
-	TIM_OC3PreloadConfig(STEPPER_STEP_TIM, ENABLE);
+	TIM_OC1Init(STEPPER_STEP_TIM, &TIM_OCInitStructure);
+	TIM_OC1PreloadConfig(STEPPER_STEP_TIM, ENABLE);
 	
 	TIM_ARRPreloadConfig(STEPPER_STEP_TIM, ENABLE);
 	TIM_Cmd(STEPPER_STEP_TIM, ENABLE);	

@@ -24,7 +24,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx.h"
-#include "helper.h"
+#include "image_processing.h"
 
 /* Exported types ------------------------------------------------------------*/
 typedef struct

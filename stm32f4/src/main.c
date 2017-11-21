@@ -15,6 +15,7 @@ u8 count = 0;
 #define MOTOR_DURATION_MS 1069
 #define ROTATION_COUNT 8
 
+
 void begin_rotate_motor(void){
 }
 
@@ -66,17 +67,25 @@ void rotate_all_section(void){
 void init(){
     SystemInit();
     led_init();			//Initiate LED
-    pump_init();
+    //pump_init();
     button_init();
-    stepper_init();
+    //stepper_init();
     // Stepper motor's speed does not depend on duty cycle of the pwm
 	ticks_init();		//Ticks initialization --> to get seconds etc
     TM_DELAY_Init();    // Special Library for Delays
     TM_ILI9341_Init();
     TM_ILI9341_Fill(ILI9341_COLOR_WHITE);
     TM_ILI9341_Rotate(TM_ILI9341_Orientation_Landscape_2);
-    pump(0, CCW);
-    stepper_spin(STEPPER_CW, 0);
+    //pump(0, CCW);
+    //stepper_spin(STEPPER_CW, 0);
+    //uart_init(COM1, 9600);
+    
+    /* Initialize USART1 at 9600 baud, TX: PB9, RX: PB10 */
+	TM_USART_Init(USART1, TM_USART_PinsPack_1, 9600);
+	
+	/* Put string to USART */
+	TM_USART_Puts(USART1, "Hello world\n");
+    
 }
 
 void analyze_dipstick_paper(){
@@ -91,22 +100,35 @@ void analyze_dipstick_paper(){
 
 int main() {
     init();
+    uint8_t c;
     /* FOR COMPLETE PIN MAPPING INFORMATION: GO TO 'doc/pin_mapping.txt'----------*/
     int camera_status = OV9655_Configuration();
+    /*
     // int status = 0;
     TM_ILI9341_Puts(0, 0, "Live Feed:", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_ORANGE);
     
     TM_ILI9341_Puts(180, 0, "STATUS: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     TM_ILI9341_Puts(180, 20, "Idle ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    
+    float test_a = powf(9.345323, 2.1);
     DCMI_CaptureCmd(ENABLE);
+    COLOR_OBJECT test = {146, 156, 50, 0};
+    test.score = interpolate(test);
+    sprintf(str, "%.2f", test.score);
+    TM_ILI9341_Puts(0, 160, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    */
+    // Test send some data
+    TM_ILI9341_Puts(0, 0, "HELLO WORLD", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    TM_ILI9341_Puts(0, 20, "DATA IS SENT", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     while(true){
-        
+        c = TM_USART_Getc(USART1);
+		if (c) {
+			/* If anything received, put it back to terminal */
+			TM_USART_Putc(USART1, c);
+		}
         if (capture_cam == true) {
              capture_cam = false;
              TM_ILI9341_DisplayImage((u16 *) frame_buffer);
         }
-        
         
         if(button_pressed(BUTTON_K0)){
             // Analyze the image in 1 press of a button
@@ -139,7 +161,7 @@ int main() {
     }
 }
 
-
+// An interrupt used by the OV9655 camera
 void DMA2_Stream1_IRQHandler(void){
 	// DMA complete
 	if(DMA_GetITStatus(DMA2_Stream1,DMA_IT_TCIF1) != RESET){

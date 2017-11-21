@@ -752,11 +752,6 @@
               <FilePath>.\inc\OV9655.h</FilePath>
             </File>
             <File>
-              <FileName>helper.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\helper.c</FilePath>
-            </File>
-            <File>
               <FileName>bluetooth_HC05.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\src\bluetooth_HC05.c</FilePath>
@@ -765,11 +760,6 @@
               <FileName>bluetooth_HC05.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\inc\bluetooth_HC05.h</FilePath>
-            </File>
-            <File>
-              <FileName>OV7670_2.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\OV7670_2.c</FilePath>
             </File>
             <File>
               <FileName>tm_stm32f4_delay.c</FileName>
@@ -830,6 +820,11 @@
               <FileName>ff.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\inc\ff.h</FilePath>
+            </File>
+            <File>
+              <FileName>image_processing.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\image_processing.c</FilePath>
             </File>
           </Files>
         </Group>

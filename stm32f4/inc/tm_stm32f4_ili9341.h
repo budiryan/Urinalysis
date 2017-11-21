@@ -132,7 +132,7 @@ VCC          3.3V         Positive power supply
 #include "tm_stm32f4_spi.h"
 #include "tm_stm32f4_dma.h"
 #include "tm_stm32f4_spi_dma.h"
-#include "helper.h"
+#include "image_processing.h"
 
 /**
  * @defgroup TM_ILI9341_Macros

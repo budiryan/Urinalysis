@@ -58,9 +58,6 @@
 			I2C_SDA    = PB9
 */
 
-// volatile uint32_t input[IMG_ROWS * IMG_COLUMNS];
-// volatile uint32_t frame_buffer[10];
-// volatile uint32_t input[10];
 /** 
   * @brief  Configures the OV9655 DCMI
   * @param  None

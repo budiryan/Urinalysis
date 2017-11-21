@@ -253,3 +253,47 @@ u32 Sqrt(u32 num) {
 	}
 }
 
+float largest_value(float numbers[], int size) {
+    float max_num = numbers[0];
+    for(int i = 0 ; i < size ; i++){
+        if (numbers[i] > max_num)
+            max_num = numbers[i];
+    }
+    return max_num;
+}
+
+int largest_arg(float numbers[], int size) {
+    int max_idx = 0;
+    float max_num = numbers[0];
+    for(int i = 0 ; i < size ; i++){
+        if (numbers[i] > max_num){
+            max_num = numbers[i];
+            max_idx = i;
+        }
+    }
+    return max_idx;
+}
+
+float smallest_value(float numbers[], int size){
+    float min_num = numbers[0];
+    for(int i = 0 ; i < size ; i++){
+        if (numbers[i] < min_num)
+            min_num = numbers[i];
+    }
+    return min_num;
+}
+
+int smallest_arg(float numbers[], int size){
+    int min_idx = 0;
+    float min_num = numbers[0];
+    for(int i = 0 ; i < size ; i++){
+        if (numbers[i] < min_num){
+            min_num = numbers[i];
+            min_idx = i;
+        }
+    }
+    return min_idx;
+}
+
+
+

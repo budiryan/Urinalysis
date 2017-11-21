@@ -1,5 +1,5 @@
 Stepper motor:
-Grey: step pin motor --> PA10
+Grey: step pin motor --> PA8
 Purple: Dir pin motor --> PD4
 Red: VCC motor
 
@@ -31,6 +31,7 @@ RST: PD12
 SCK: PB3
 MOSI: PB5
 MISO: Not Used
+LED: 3.3V
 
 Button:
 K0: PE4 -- Crash D6's Camera
@@ -39,3 +40,7 @@ K1: PE3
 LED:
 LED1: PA6 -- Crash with PXCLK's Camera --> not used
 LED2: PA7
+
+USART:
+Bluetooth RX: PA9 
+Bluetooth TX: PA10
