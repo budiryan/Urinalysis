@@ -682,11 +682,6 @@
               <FilePath>.\src\ticks.c</FilePath>
             </File>
             <File>
-              <FileName>usart.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\usart.c</FilePath>
-            </File>
-            <File>
               <FileName>tft_display.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\src\tft_display.c</FilePath>
@@ -752,16 +747,6 @@
               <FilePath>.\inc\OV9655.h</FilePath>
             </File>
             <File>
-              <FileName>bluetooth_HC05.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\bluetooth_HC05.c</FilePath>
-            </File>
-            <File>
-              <FileName>bluetooth_HC05.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\inc\bluetooth_HC05.h</FilePath>
-            </File>
-            <File>
               <FileName>tm_stm32f4_delay.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\src\tm_stm32f4_delay.c</FilePath>
@@ -825,6 +810,16 @@
               <FileName>image_processing.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\src\image_processing.c</FilePath>
+            </File>
+            <File>
+              <FileName>usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\usart.c</FilePath>
+            </File>
+            <File>
+              <FileName>usart.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\usart.h</FilePath>
             </File>
           </Files>
         </Group>

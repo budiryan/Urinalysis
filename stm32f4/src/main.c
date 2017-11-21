@@ -67,24 +67,19 @@ void rotate_all_section(void){
 void init(){
     SystemInit();
     led_init();			//Initiate LED
-    //pump_init();
+    pump_init();
     button_init();
-    //stepper_init();
+    stepper_init();
     // Stepper motor's speed does not depend on duty cycle of the pwm
 	ticks_init();		//Ticks initialization --> to get seconds etc
     TM_DELAY_Init();    // Special Library for Delays
     TM_ILI9341_Init();
     TM_ILI9341_Fill(ILI9341_COLOR_WHITE);
     TM_ILI9341_Rotate(TM_ILI9341_Orientation_Landscape_2);
-    //pump(0, CCW);
-    //stepper_spin(STEPPER_CW, 0);
-    //uart_init(COM1, 9600);
-    
-    /* Initialize USART1 at 9600 baud, TX: PB9, RX: PB10 */
-	TM_USART_Init(USART1, TM_USART_PinsPack_1, 9600);
-	
-	/* Put string to USART */
-	TM_USART_Puts(USART1, "Hello world\n");
+    pump(0, CCW);
+    stepper_spin(STEPPER_CW, 0);
+    uart_init(COM1, 9600);
+    uart_tx(COM1, "my name is buddy\n");
     
 }
 
@@ -100,7 +95,7 @@ void analyze_dipstick_paper(){
 
 int main() {
     init();
-    uint8_t c;
+    char c;
     /* FOR COMPLETE PIN MAPPING INFORMATION: GO TO 'doc/pin_mapping.txt'----------*/
     int camera_status = OV9655_Configuration();
     /*
@@ -120,11 +115,10 @@ int main() {
     TM_ILI9341_Puts(0, 0, "HELLO WORLD", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     TM_ILI9341_Puts(0, 20, "DATA IS SENT", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     while(true){
-        c = TM_USART_Getc(USART1);
-		if (c) {
-			/* If anything received, put it back to terminal */
-			TM_USART_Putc(USART1, c);
-		}
+        c = uart_rx_byte(COM1);
+        TM_ILI9341_Puts(0, 40, "    ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+        sprintf(str, "%c", c);
+        TM_ILI9341_Puts(0, 40, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
         if (capture_cam == true) {
              capture_cam = false;
              TM_ILI9341_DisplayImage((u16 *) frame_buffer);
