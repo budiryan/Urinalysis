@@ -1,5 +1,5 @@
 Stepper motor:
-Grey: step pin motor --> PA8
+Grey: step pin motor --> PA10
 Purple: Dir pin motor --> PD4
 Red: VCC motor
 
@@ -13,13 +13,13 @@ D2 / D0 = PC6
 D3 / D1 = PC7 
 D4 / D2 = PE0 
 D5 / D3 = PE1 
-D6 / D4 = PE4 --> Switch to PC11
+D6 / D4 = PE4
 D7 / D5 = PB6 
 D8 / D6 = PE5 
 D9/ D7 = PE6 
 HSYNC = PA4 
 VSYNC = PB7 
-XCLK = PC9 
+XCLK = PC9 --> PA8 
 PXCLK = PA6 
 SIO_C = PB8 
 SIO_D = PB9
@@ -42,5 +42,16 @@ LED1: PA6 -- Crash with PXCLK's Camera --> not used
 LED2: PA7
 
 USART:
-Bluetooth RX: PA9 
-Bluetooth TX: PA10
+Bluetooth RX: PB10 USART3 
+Bluetooth TX: PB11 USART3
+
+SD Card:
+SDIO D0 - DAT0 - PC8
+SDIO D1 - DAT1 - PC9 - CLASH WITH XCLK
+SDIO D2 - DAT2 - PC10
+SDIO D3 - DAT3 / CD - PC11 - CLASH WITH DCMI_D4
+SDIO CMD - CMD - PD2 
+SDIO SCK - SCK - PC12
+VCC
+GND
+NC / VSS2 -  GND

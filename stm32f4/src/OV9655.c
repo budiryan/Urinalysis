@@ -96,8 +96,6 @@ uint8_t OV9655_Configuration(void){
     // Set the RGB565 mode
     DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_COM7, 0x63);
     DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_COM15, 0x10);
-    //DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_COM7, 0x67);
-    //DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_COM15, 0xd1);
         
     // Invert the HRef signal
     DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS, OV9655_COM10, 0x08);
@@ -119,7 +117,7 @@ uint8_t OV9655_Configuration(void){
     // DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS,0x8d, 0x00); //color test	on
 	// DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS,0x0c, 0x00); //color test	on
     // Adjust brightness of the image
-    DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS,0x55, 0xAF);
+    // DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS,0x55, 0xAF);
     // DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS,0x41, 0x43);
     // Contrast settings
     // DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS,0x56, 0x3A);
@@ -133,6 +131,7 @@ uint8_t OV9655_Configuration(void){
   * @retval None
   */
 void OV9655_MCO_Configuration(void){
+  /*
   GPIO_InitTypeDef GPIO_InitStructure;
   
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
@@ -149,13 +148,30 @@ void OV9655_MCO_Configuration(void){
   RCC_PLLI2SCmd(DISABLE);
   
   RCC_PLLI2SConfig(48, 2); // 192..432, 2..7, ie range of 27.429 Mhz to 192 MHz
-  /* PLLI2SSCLK = 240 / 5 = 48Mhz */
-	/* MCO2 Output Freq = 48 / 2 = 24Mhz*/
+  // PLLI2SSCLK = 240 / 5 = 48Mhz 
+	// MCO2 Output Freq = 48 / 2 = 24Mhz
   RCC_MCO2Config(RCC_MCO2Source_PLLI2SCLK, RCC_MCO2Div_2); // 24 MHz with default PLL fComp
   
   RCC_PLLI2SCmd(ENABLE);
   
   while(RCC_GetFlagStatus(RCC_FLAG_PLLI2SRDY) == RESET);
+  */
+  
+    GPIO_InitTypeDef GPIO_InitStructure;
+
+    // Enable GPIOs clocks
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+        
+    // Configure MCO (PA8)
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+    GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;  
+    GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+    RCC_MCO1Config(RCC_MCO1Source_HSI, RCC_MCO1Div_1);
+    
 }
 
 /**
@@ -198,7 +214,7 @@ void OV9655_DCMI_Configuration(void)
   
   // DCMI GPIO configuration
   // D0 D1(PC6/7/11)
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7 |GPIO_Pin_11;
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7 | GPIO_Pin_11;
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
@@ -206,7 +222,7 @@ void OV9655_DCMI_Configuration(void)
   GPIO_Init(GPIOC, &GPIO_InitStructure);
 
   // D2..D4(PE0/1) D6/D7(PE5/6)
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1
 	                              | GPIO_Pin_5 | GPIO_Pin_6;
   GPIO_Init(GPIOE, &GPIO_InitStructure);
 

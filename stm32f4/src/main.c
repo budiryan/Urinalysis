@@ -14,10 +14,11 @@ u8 count = 0;
 #define PUMP_DURATION 57
 #define MOTOR_DURATION_MS 1069
 #define ROTATION_COUNT 8
-
-
-void begin_rotate_motor(void){
-}
+//Fatfs object
+FATFS FatFs;
+//File object
+FIL fil;
+FRESULT fres;
 
 void begin_pump(void){
     // Pump for some seconds
@@ -67,19 +68,19 @@ void rotate_all_section(void){
 void init(){
     SystemInit();
     led_init();			//Initiate LED
-    pump_init();
+    // pump_init();
     button_init();
-    stepper_init();
+    // stepper_init();
     // Stepper motor's speed does not depend on duty cycle of the pwm
 	ticks_init();		//Ticks initialization --> to get seconds etc
     TM_DELAY_Init();    // Special Library for Delays
     TM_ILI9341_Init();
     TM_ILI9341_Fill(ILI9341_COLOR_WHITE);
     TM_ILI9341_Rotate(TM_ILI9341_Orientation_Landscape_2);
-    pump(0, CCW);
-    stepper_spin(STEPPER_CW, 0);
-    uart_init(COM1, 9600);
-    uart_tx(COM1, "my name is buddy\n");
+    // pump(0, CCW);
+    // stepper_spin(STEPPER_CW, 0);
+    uart_init(COM3, 9600);
+    uart_tx(COM3, "MEMEKZ\n");
     
 }
 
@@ -92,12 +93,27 @@ void analyze_dipstick_paper(){
     TM_ILI9341_Puts(180, 20, "         ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
 }
 
+void sd_transfer_data(){
+    fres = f_mount(&FatFs, "", 1);
+    Delayms(1000);
+    //TM_ILI9341_Puts(180, 0, itoa(fres, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    
+    fres = f_open(&fil, "result4.txt", FA_OPEN_ALWAYS | FA_READ | FA_WRITE);
+    //TM_ILI9341_Puts(180, 20, itoa(fres, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    
+    fres = f_write(&fil, "Budi Ryan", 10, NULL);
+    
+    fres = f_close(&fil);
+    TM_ILI9341_Puts(180, 40, itoa(fres, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);    
+    
+    f_mount(0, "", 1);
+    
+}
 
 int main() {
     init();
-    char c;
     /* FOR COMPLETE PIN MAPPING INFORMATION: GO TO 'doc/pin_mapping.txt'----------*/
-    int camera_status = OV9655_Configuration();
+
     /*
     // int status = 0;
     TM_ILI9341_Puts(0, 0, "Live Feed:", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_ORANGE);
@@ -105,20 +121,26 @@ int main() {
     TM_ILI9341_Puts(180, 0, "STATUS: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     TM_ILI9341_Puts(180, 20, "Idle ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     float test_a = powf(9.345323, 2.1);
-    DCMI_CaptureCmd(ENABLE);
+    
     COLOR_OBJECT test = {146, 156, 50, 0};
     test.score = interpolate(test);
     sprintf(str, "%.2f", test.score);
     TM_ILI9341_Puts(0, 160, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     */
-    // Test send some data
-    TM_ILI9341_Puts(0, 0, "HELLO WORLD", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    TM_ILI9341_Puts(0, 20, "DATA IS SENT", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    
+
+    
+    int camera_status = OV9655_Configuration();
+    sprintf(str, "cam status: %d", camera_status);
+    TM_ILI9341_Puts(0, 160, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    DCMI_CaptureCmd(ENABLE);
+    sd_transfer_data();
     while(true){
-        c = uart_rx_byte(COM1);
-        TM_ILI9341_Puts(0, 40, "    ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-        sprintf(str, "%c", c);
-        TM_ILI9341_Puts(0, 40, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+        sprintf(str, "Time: %d", get_seconds());
+        TM_ILI9341_Puts(0, 140, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+
+        
+        
         if (capture_cam == true) {
              capture_cam = false;
              TM_ILI9341_DisplayImage((u16 *) frame_buffer);
@@ -150,10 +172,13 @@ int main() {
             // Capture one time and display analysis
             while(button_pressed(BUTTON_K1));
             analyze_dipstick_paper();
+            // sd_transfer_data();
         }
+        
         
     }
 }
+
 
 // An interrupt used by the OV9655 camera
 void DMA2_Stream1_IRQHandler(void){
@@ -164,6 +189,8 @@ void DMA2_Stream1_IRQHandler(void){
         capture_cam = true;
     }
 }
+
+
 
 
 

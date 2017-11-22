@@ -56,6 +56,7 @@
 #include "tm_stm32f4_spi.h"
 #include "tm_stm32f4_spi_dma.h"
 #include "tm_stm32f4_delay.h"
+#include "tm_stm32f4_fatfs.h"
 #include "I2C.h"
 #include "OV9655.h"
 #include "image_processing.h"

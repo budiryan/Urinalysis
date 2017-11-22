@@ -3,9 +3,9 @@
 uint8_t rx_buffer[256] = { 0 };
 uint8_t rx_full = 0;
 on_receive_listener *uart1_rx_listener;
-on_receive_listener *uart2_rx_listener;
+on_receive_listener *uart3_rx_listener;
 uint8_t uart1_listener_empty = 1;
-uint8_t uart2_listener_empty = 1;
+uint8_t uart3_listener_empty = 1;
 
 #ifdef __GNUC__
 /* With GCC/RAISONANCE, small printf (option LD Linker->Libraries->Small printf
@@ -15,15 +15,15 @@ uint8_t uart2_listener_empty = 1;
 #define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
 #endif /* __GNUC__ */
 
-USART_TypeDef* COM_USART[COMn] = {USART1, USART2}; 
-GPIO_TypeDef* COM_TX_PORT[COMn] = {COM1_TX_GPIO_PORT, COM2_TX_GPIO_PORT}; 
-GPIO_TypeDef* COM_RX_PORT[COMn] = {COM1_RX_GPIO_PORT, COM2_RX_GPIO_PORT}; 
-uc32 COM_USART_CLK[COMn] = {COM1_CLK, COM2_CLK};
-uc32 COM_TX_PORT_CLK[COMn] = {COM1_TX_GPIO_CLK, COM2_TX_GPIO_CLK}; 
-uc32 COM_RX_PORT_CLK[COMn] = {COM1_RX_GPIO_CLK, COM2_RX_GPIO_CLK};
-uc16 COM_TX_PIN[COMn] = {COM1_TX_PIN, COM2_TX_PIN};
-uc16 COM_RX_PIN[COMn] = {COM1_RX_PIN, COM2_RX_PIN};
-uc16 COM_IRQ[COMn] = {USART1_IRQn, USART2_IRQn};
+USART_TypeDef* COM_USART[COMn] = {USART1, USART3}; 
+GPIO_TypeDef* COM_TX_PORT[COMn] = {COM1_TX_GPIO_PORT, COM3_TX_GPIO_PORT}; 
+GPIO_TypeDef* COM_RX_PORT[COMn] = {COM1_RX_GPIO_PORT, COM3_RX_GPIO_PORT}; 
+uc32 COM_USART_CLK[COMn] = {COM1_CLK, COM3_CLK};
+uc32 COM_TX_PORT_CLK[COMn] = {COM1_TX_GPIO_CLK, COM3_TX_GPIO_CLK}; 
+uc32 COM_RX_PORT_CLK[COMn] = {COM1_RX_GPIO_CLK, COM3_RX_GPIO_CLK};
+uc16 COM_TX_PIN[COMn] = {COM1_TX_PIN, COM3_TX_PIN};
+uc16 COM_RX_PIN[COMn] = {COM1_RX_PIN, COM3_RX_PIN};
+uc16 COM_IRQ[COMn] = {USART1_IRQn, USART3_IRQn};
 
 COM_TypeDef printf_COMx;
 
@@ -48,8 +48,8 @@ void uart_init(COM_TypeDef COM, u32 br)
 	else
 	{
 		RCC_APB1PeriphClockCmd(COM_USART_CLK[COM], ENABLE);
-        GPIO_PinAFConfig(GPIOA, GPIO_PinSource2, GPIO_AF_USART2);//Connect PB10 to USART2_Tx
-        GPIO_PinAFConfig(GPIOA, GPIO_PinSource3, GPIO_AF_USART2);//Connect PB11 to USART2_Rx
+        GPIO_PinAFConfig(GPIOB, GPIO_PinSource10, GPIO_AF_USART3);//Connect PB10 to USART3_Tx
+        GPIO_PinAFConfig(GPIOB, GPIO_PinSource11, GPIO_AF_USART3);//Connect PB11 to USART3_Rx
 	}
 
 	/* Configure USART Tx & USART Rx as alternate function push-pull */
@@ -165,10 +165,10 @@ void uart_interrupt_init(COM_TypeDef COM, on_receive_listener *listener)
 		uart1_rx_listener = listener;
 		uart1_listener_empty = 0;
 	}
-	else if (COM == COM2)
+	else if (COM == COM3)
 	{
-		uart2_rx_listener = listener;
-		uart2_listener_empty = 0;
+		uart3_rx_listener = listener;
+		uart3_listener_empty = 0;
 	}
 	else
 		assert(0);
@@ -186,6 +186,16 @@ void USART1_IRQHandler(void)
 	}
 }
 
+
+void USART3_IRQHandler(void)
+{
+	if(USART_GetITStatus(USART3,USART_IT_RXNE) != RESET)
+	{ // check RX interrupt
+		if (!uart3_listener_empty)
+			(*uart3_rx_listener)(USART_ReceiveData(USART1));
+		USART_ClearITPendingBit(USART3, USART_IT_RXNE);
+	}
+}
 
 /*
 void USART2_IRQHandler(void)

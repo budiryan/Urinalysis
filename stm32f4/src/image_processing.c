@@ -525,7 +525,7 @@ void display_color_average(u16 image[], u16 array_length, COLOR_TYPE color){
 
 void capture_one_time(void){
     DCMI_CaptureCmd(ENABLE);
-    TM_ILI9341_DisplayImage((uint16_t*) frame_buffer);
+    // TM_ILI9341_DisplayImage((uint16_t*) frame_buffer);
     _delay_ms(500);
     DCMI_CaptureCmd(DISABLE);
 }
