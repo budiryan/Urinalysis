@@ -60,7 +60,7 @@ void rotate_all_section(void){
     }
     */
     stepper_spin(STEPPER_CW, 300);
-    Delayms(MOTOR_DURATION_MS);
+    delay_ms(MOTOR_DURATION_MS);
     // After some second, stop
     stepper_spin(STEPPER_CW, 0);
 }
@@ -73,7 +73,8 @@ void init(){
     // stepper_init();
     // Stepper motor's speed does not depend on duty cycle of the pwm
 	ticks_init();		//Ticks initialization --> to get seconds etc
-    TM_DELAY_Init();    // Special Library for Delays
+    // TM_DELAY_Init();    // Special Library for Delays
+    delay_init();
     TM_ILI9341_Init();
     TM_ILI9341_Fill(ILI9341_COLOR_WHITE);
     TM_ILI9341_Rotate(TM_ILI9341_Orientation_Landscape_2);
@@ -85,17 +86,16 @@ void init(){
 }
 
 void analyze_dipstick_paper(){
-    Delayms(1000);
+    delay_ms(1000);
     TM_ILI9341_DisplayImage((u16 *) frame_buffer);
     TM_ILI9341_Puts(180, 20, "Analyzing", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     display_color_average((u16 *)segmentation, 25, RGB565);
-    Delayms(1500);
+    delay_ms(1500);
     TM_ILI9341_Puts(180, 20, "         ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
 }
 
 void sd_transfer_data(){
     fres = f_mount(&FatFs, "", 1);
-    Delayms(1000);
     //TM_ILI9341_Puts(180, 0, itoa(fres, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     
     fres = f_open(&fil, "result4.txt", FA_OPEN_ALWAYS | FA_READ | FA_WRITE);
@@ -114,12 +114,13 @@ int main() {
     init();
     /* FOR COMPLETE PIN MAPPING INFORMATION: GO TO 'doc/pin_mapping.txt'----------*/
 
-    /*
+    
     // int status = 0;
     TM_ILI9341_Puts(0, 0, "Live Feed:", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_ORANGE);
     
     TM_ILI9341_Puts(180, 0, "STATUS: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     TM_ILI9341_Puts(180, 20, "Idle ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    /*
     float test_a = powf(9.345323, 2.1);
     
     COLOR_OBJECT test = {146, 156, 50, 0};
@@ -136,16 +137,11 @@ int main() {
     DCMI_CaptureCmd(ENABLE);
     sd_transfer_data();
     while(true){
-        sprintf(str, "Time: %d", get_seconds());
-        TM_ILI9341_Puts(0, 140, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-
-        
-        
         if (capture_cam == true) {
              capture_cam = false;
              TM_ILI9341_DisplayImage((u16 *) frame_buffer);
         }
-        
+        /*
         if(button_pressed(BUTTON_K0)){
             // Analyze the image in 1 press of a button
             while(button_pressed(BUTTON_K0));
@@ -167,12 +163,11 @@ int main() {
             TM_ILI9341_Puts(180, 40, "            ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
             
         }
-        
-        else if(button_pressed(BUTTON_K1)){
+        */
+        if(button_pressed(BUTTON_K1)){
             // Capture one time and display analysis
             while(button_pressed(BUTTON_K1));
             analyze_dipstick_paper();
-            // sd_transfer_data();
         }
         
         

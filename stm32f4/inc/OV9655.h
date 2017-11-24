@@ -25,6 +25,8 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx.h"
 #include "image_processing.h"
+#include "delay.h"
+#include "I2C.h"
 
 /* Exported types ------------------------------------------------------------*/
 typedef struct
