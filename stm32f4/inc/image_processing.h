@@ -28,7 +28,7 @@ typedef struct {
     int R;
     int G;
     int B;
-    float score;
+    int score;
 } COLOR_OBJECT;
 
 float interpolate(COLOR_OBJECT test_data);

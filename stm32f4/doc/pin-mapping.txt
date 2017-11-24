@@ -1,6 +1,6 @@
 Stepper motor:
 Grey: step pin motor --> PA10
-Purple: Dir pin motor --> PD4
+Purple: Dir pin motor --> PA9
 Red: VCC motor
 
 Pump:
@@ -13,7 +13,7 @@ D2 / D0 = PC6
 D3 / D1 = PC7 
 D4 / D2 = PE0 
 D5 / D3 = PE1 
-D6 / D4 = PE4
+D6 / D4 = PC11
 D7 / D5 = PB6 
 D8 / D6 = PE5 
 D9/ D7 = PE6 
@@ -25,9 +25,9 @@ SIO_C = PB8
 SIO_D = PB9
 
 LCD:
-CS: PC2
-D/C: PD13
-RST: PD12
+CS: PA15
+D/C: PD6
+RST: PD4
 SCK: PB3
 MOSI: PB5
 MISO: Not Used
@@ -49,7 +49,7 @@ SD Card:
 SDIO D0 - DAT0 - PC8
 SDIO D1 - DAT1 - PC9 - CLASH WITH XCLK
 SDIO D2 - DAT2 - PC10
-SDIO D3 - DAT3 / CD - PC11 - CLASH WITH DCMI_D4
+SDIO D3 - DAT3 / CD - PC11 - CLASH WITH DCMI_D4v --> OK NOW, only use D0 as data transfer line
 SDIO CMD - CMD - PD2 
 SDIO SCK - SCK - PC12
 VCC

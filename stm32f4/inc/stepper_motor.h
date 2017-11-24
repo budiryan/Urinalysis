@@ -8,9 +8,9 @@
 #include <stdint.h>
 
 // Dir pin: PC9
-#define STEPPER_DIR_GPIO_PIN GPIO_Pin_4
-#define STEPPER_DIR_GPIO GPIOD
-#define STEPPER_DIR_GPIO_RCC RCC_AHB1Periph_GPIOD
+#define STEPPER_DIR_GPIO_PIN GPIO_Pin_9
+#define STEPPER_DIR_GPIO GPIOA
+#define STEPPER_DIR_GPIO_RCC RCC_AHB1Periph_GPIOA
 
 // Step pin: Step pin: PA8
 #define STEPPER_STEP_TIM			   TIM1

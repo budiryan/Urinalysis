@@ -30,7 +30,7 @@ extern volatile uint16_t frame_buffer[CAMERA_ROWS * CAMERA_COLUMNS];
 /* Private typedef -----------------------------------------------------------*/
    RCC_ClocksTypeDef RCC_Clocks;
 /* Private define ------------------------------------------------------------*/
-   #define  TIMEOUT  2
+   #define  TIMEOUT  4
    #define  DCMI_DR_ADDRESS     0x50050028
    #define  FSMC_LCD_ADDRESS    0x60020000
 /* Bits definitions ----------------------------------------------------------*/

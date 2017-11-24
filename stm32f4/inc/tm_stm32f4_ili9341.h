@@ -153,8 +153,8 @@ VCC          3.3V         Positive power supply
  * @brief  CS PIN for SPI, used as on STM32F429-Discovery board
  */
 #ifndef ILI9341_CS_PIN
-#define ILI9341_CS_PORT       GPIOC
-#define ILI9341_CS_PIN        GPIO_PIN_2
+#define ILI9341_CS_PORT       GPIOD
+#define ILI9341_CS_PIN        GPIO_PIN_7
 #endif
 
 /**
@@ -162,7 +162,7 @@ VCC          3.3V         Positive power supply
  */
 #ifndef ILI9341_WRX_PIN
 #define ILI9341_WRX_PORT      GPIOD
-#define ILI9341_WRX_PIN       GPIO_PIN_13
+#define ILI9341_WRX_PIN       GPIO_PIN_6
 #endif
 
 /**
@@ -170,7 +170,7 @@ VCC          3.3V         Positive power supply
  */
 #ifndef ILI9341_RST_PIN
 #define ILI9341_RST_PORT      GPIOD
-#define ILI9341_RST_PIN       GPIO_PIN_12
+#define ILI9341_RST_PIN       GPIO_PIN_4
 #endif
 
 /* LCD settings */

@@ -1,10 +1,25 @@
 #include "image_processing.h"
+/*
+This reference colors are from the original paper
 #define REF1_VAL {146, 203, 170, 0.0}
 #define REF2_VAL {144, 197, 106, 100.0}
 #define REF3_VAL {118, 163, 47, 200.0}
 #define REF4_VAL {132, 118, 19, 500.0}
 #define REF5_VAL {124, 82, 0, 1000.0}
 #define REF6_VAL {90, 40, 13, 2000.0}
+*/
+
+// Reference color from real environment --> mg / dL
+#define REF1_VAL {175, 167, 127, 0}
+#define REF2_VAL {135, 159, 119, 15}
+#define REF3_VAL {95, 151, 119, 50}
+#define REF4_VAL {79, 135, 119, 150}
+#define REF5_VAL {71, 103, 87, 500}
+#define REF6_VAL {44, 71, 63, 1000}
+
+
+// Constants used for rgb transformation
+extern char str[100];
 float ref_x = 95.047;
 float ref_y = 100.0;
 float ref_z = 108.883;
@@ -19,7 +34,6 @@ COLOR_OBJECT ref5 = REF5_VAL;
 COLOR_OBJECT ref6 = REF6_VAL;
 
 void assign_interpolation_index(int * idx_b, int * idx_c, int idx_n, const int NUM_REFERENCE, float ref_dist[], float test_ref_dist[]){
-    char str[20];
     if(idx_n - 1 < 0){
         *idx_b = idx_n;
         *idx_c = idx_n + 1;
@@ -38,30 +52,38 @@ void assign_interpolation_index(int * idx_b, int * idx_c, int idx_n, const int N
         idx_node = 0;
     else
         idx_node = 1;
-    TM_ILI9341_Puts(180, 60, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     switch(idx_node){
         case 0:
             if (test_ref_dist[idx_n - 1] < ref_dist[idx_n - 1]){
                *idx_b = idx_n - 1;
                *idx_c = idx_n;
+                return;
             }
         break;
         case 1:
             if (test_ref_dist[idx_n + 1] < ref_dist[idx_n]){
                *idx_b = idx_n;
                *idx_c = idx_n + 1;
+                return;
             }
         break;
+        
         default:
             // Test data is invalid
             *idx_b = -1;
             *idx_c = -1;
+            return;
+            
     }
+    *idx_b = idx_n;
+    *idx_c = idx_n + 1;
 }
 
 float interpolate(COLOR_OBJECT test_data){
-    char str[40];
-    // Algorithm based on the paper: http://ieeexplore.ieee.org/document/6865777/
+    /*
+     * Algorithm based on the paper: http://ieeexplore.ieee.org/document/6865777/
+     * Author: Budi RYAN
+     */
     // Define reference data, test data and other necessary flags + variables
     const int NUM_REFERENCE = 6;
     const int NUM_STAGE = NUM_REFERENCE - 1;
@@ -70,23 +92,27 @@ float interpolate(COLOR_OBJECT test_data){
     float test_ref_dist[NUM_REFERENCE];
     int idx_n, stage, idx_b, idx_c;
     float cx, bx, final_score;
-    
+   
     // Calculate the distance within reference data
     for(int i=0; i < NUM_STAGE; i++){
         ref_dist[i] = RGB_color_Lab_difference_CIE76(ref_data[i], ref_data[i + 1]);
     }
-    
+
     // Calculate the distance from test data to each of the reference data
     for(int i=0; i < NUM_REFERENCE; i++){
         test_ref_dist[i] = RGB_color_Lab_difference_CIE76(test_data, ref_data[i]);
     }
-    
+    /* DEBUG
+    sprintf(str, "%.2f\n%.2f\n%.2f\n%.2f\n%.2f\n%.2f",test_ref_dist[0],test_ref_dist[1],test_ref_dist[2],test_ref_dist[3],test_ref_dist[4],test_ref_dist[5]);
+    TM_ILI9341_Puts(180, 40, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    sprintf(str, "%.2f\n%.2f\n%.2f\n%.2f\n%.2f",ref_dist[0],ref_dist[1],ref_dist[2],ref_dist[3],ref_dist[4]);
+    TM_ILI9341_Puts(240, 40, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    */
     idx_n = smallest_arg(test_ref_dist, NUM_STAGE);
     
     assign_interpolation_index(&idx_b, &idx_c, idx_n, NUM_REFERENCE, ref_dist, test_ref_dist);
-    sprintf(str, "idx_b: %d", idx_b);
-    TM_ILI9341_Puts(0, 230, str, &TM_Font_7x10, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     // test data is out of range
+    /*
     if (idx_b < 0 || idx_c < 0){
         TM_ILI9341_Puts(0, 180, "Fail 1", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
         return -1;
@@ -97,12 +123,12 @@ float interpolate(COLOR_OBJECT test_data){
         TM_ILI9341_Puts(0, 180, "Fail 2", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
         return -1;
     }
-    
+    */
     // use trigonometry formula to find cx
-    cx = (powf(test_ref_dist[idx_b], 2.0f) - powf(ref_dist[idx_b], 2.0f) - powf(test_ref_dist[idx_c], 2.0f)) / (-2.0f * ref_dist[idx_b]);
+    cx = ((test_ref_dist[idx_b] * test_ref_dist[idx_b]) - (ref_dist[idx_b] * ref_dist[idx_b]) - (test_ref_dist[idx_c] * test_ref_dist[idx_c])) / (-2.0f * ref_dist[idx_b]);
     // score of the test data is finally evaluated
     bx = ref_dist[idx_b] - cx;
-    final_score = ((bx / ref_dist[idx_b]) * (ref_data[idx_c].score - ref_data[idx_b].score)) + ref_data[idx_b].score;
+    final_score = ((bx / ref_dist[idx_b]) * (float)(ref_data[idx_c].score - ref_data[idx_b].score)) + ref_data[idx_b].score;
     return final_score;
 }
 
@@ -452,8 +478,7 @@ void display_color_average(u16 image[], u16 array_length, COLOR_TYPE color){
     int32_t diff_1000_b;
     int32_t diff_1000;
     int32_t glucose_detected = 0;
-    
-    char str[40];
+   
     switch(color){
         case RGB555:
             for(int i = 0 ; i < array_length; i++){
@@ -485,42 +510,38 @@ void display_color_average(u16 image[], u16 array_length, COLOR_TYPE color){
         break;
     }
     
-    // Calculate the euclidean distance for negative glucose
-    diff_neg_r = r - glucose_neg_r;
-    diff_neg_g = g - glucose_neg_g;
-    diff_neg_b = b - glucose_neg_b;
-    diff_neg = Sqrt(Sqr(diff_neg_r) + Sqr(diff_neg_g) + Sqr(diff_neg_b));
-    
-    // Calculate the euclidean distance for positive glucose
-    diff_1000_r = r - glucose_1000_r;
-    diff_1000_g = g - glucose_1000_g;
-    diff_1000_b = b - glucose_1000_b;
-    diff_1000 = Sqrt(Sqr(diff_1000_r) + Sqr(diff_1000_g) + Sqr(diff_1000_b));
-    
+    // convert to cie lab
+    float X, Y, Z;
+    float L, A, B;
+    float interpolation_score;
+    // convert r, g, b to 255 scale
+    r = r / 32.0f * 255.0f;
+    g = g / 32.0f * 255.0f;
+    b = b / 32.0f * 255.0f;
+    convertRGBtoXYZ(r, g, b, &X, &Y, &Z);
+    convertXYZtoLab(X, Y, Z, &L, &A, &B);
+    COLOR_OBJECT test = {r, g, b, 0};
     TM_ILI9341_Puts(0, 140, "               ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     TM_ILI9341_Puts(0, 160, "               ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     TM_ILI9341_Puts(0, 180, "               ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    TM_ILI9341_Puts(0, 140, "R: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    TM_ILI9341_Puts(0, 160, "G: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    TM_ILI9341_Puts(0, 140, "L: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    TM_ILI9341_Puts(0, 160, "A: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     TM_ILI9341_Puts(0, 180, "B: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     
-    TM_ILI9341_Puts(20, 140, itoa(r, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    TM_ILI9341_Puts(20, 160, itoa(g, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    TM_ILI9341_Puts(20, 180, itoa(b, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    sprintf(str, "%.2f", L);
+    TM_ILI9341_Puts(20, 140, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    sprintf(str, "%.2f", A);
+    TM_ILI9341_Puts(20, 160, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    sprintf(str, "%.2f", B);
+    TM_ILI9341_Puts(20, 180, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     
-    TM_ILI9341_Puts(0, 200, "Analyzed paper color:", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    TM_ILI9341_DrawFilledRectangle(0, 220, 20, 240, overall);
     
-    TM_ILI9341_Puts(180, 100, "           ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    TM_ILI9341_Puts(180, 120, "           ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    TM_ILI9341_Puts(180, 100, "Result: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    if (diff_neg < diff_1000){
-        TM_ILI9341_Puts(180, 120, "No glucose", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    }
-    else if (diff_neg > diff_1000){
-        TM_ILI9341_Puts(180, 120, "glucose", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    }
-    
+    TM_ILI9341_Puts(0, 200, "score:", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    interpolation_score = interpolate(test);
+    //TM_ILI9341_Puts(0, 220, "                             ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    sprintf(str, "%.2f", interpolation_score);
+    // TM_ILI9341_DrawFilledRectangle(0, 220, 20, 240, overall);
+    TM_ILI9341_Puts(0, 220, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
 }
 
 void capture_one_time(void){

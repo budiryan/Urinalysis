@@ -68,18 +68,17 @@ void rotate_all_section(void){
 void init(){
     SystemInit();
     led_init();			//Initiate LED
-    // pump_init();
+    pump_init();
     button_init();
-    // stepper_init();
+    stepper_init();
     // Stepper motor's speed does not depend on duty cycle of the pwm
 	ticks_init();		//Ticks initialization --> to get seconds etc
-    // TM_DELAY_Init();    // Special Library for Delays
     delay_init();
     TM_ILI9341_Init();
     TM_ILI9341_Fill(ILI9341_COLOR_WHITE);
-    TM_ILI9341_Rotate(TM_ILI9341_Orientation_Landscape_2);
-    // pump(0, CCW);
-    // stepper_spin(STEPPER_CW, 0);
+    TM_ILI9341_Rotate(TM_ILI9341_Orientation_Landscape_1);
+    pump(400, CCW);
+    stepper_spin(STEPPER_CCW, 400);
     uart_init(COM3, 9600);
     uart_tx(COM3, "MEMEKZ\n");
     
@@ -116,7 +115,7 @@ int main() {
 
     
     // int status = 0;
-    TM_ILI9341_Puts(0, 0, "Live Feed:", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_ORANGE);
+    TM_ILI9341_Puts(0, 0, "Live Feed:", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     
     TM_ILI9341_Puts(180, 0, "STATUS: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     TM_ILI9341_Puts(180, 20, "Idle ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
@@ -131,9 +130,7 @@ int main() {
     
 
     
-    int camera_status = OV9655_Configuration();
-    sprintf(str, "cam status: %d", camera_status);
-    TM_ILI9341_Puts(0, 160, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    OV9655_Configuration();
     DCMI_CaptureCmd(ENABLE);
     sd_transfer_data();
     while(true){

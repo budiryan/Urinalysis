@@ -737,29 +737,9 @@
               <FilePath>.\src\stepper_motor.c</FilePath>
             </File>
             <File>
-              <FileName>OV9655.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\OV9655.c</FilePath>
-            </File>
-            <File>
-              <FileName>OV9655.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\inc\OV9655.h</FilePath>
-            </File>
-            <File>
-              <FileName>tm_stm32f4_delay.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\tm_stm32f4_delay.c</FilePath>
-            </File>
-            <File>
               <FileName>tm_stm32f4_timer_properties.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\src\tm_stm32f4_timer_properties.c</FilePath>
-            </File>
-            <File>
-              <FileName>tm_stm32f4_delay.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\inc\tm_stm32f4_delay.h</FilePath>
             </File>
             <File>
               <FileName>tm_stm32f4_fatfs.c</FileName>
@@ -817,9 +797,14 @@
               <FilePath>.\src\usart.c</FilePath>
             </File>
             <File>
-              <FileName>usart.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\inc\usart.h</FilePath>
+              <FileName>delay.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\delay.c</FilePath>
+            </File>
+            <File>
+              <FileName>OV9655.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\OV9655.c</FilePath>
             </File>
           </Files>
         </Group>
