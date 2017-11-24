@@ -14,9 +14,9 @@ u8 count = 0;
 #define PUMP_DURATION 57
 #define MOTOR_DURATION_MS 1069
 #define ROTATION_COUNT 8
+
 //Fatfs object
 FATFS FatFs;
-//File object
 FIL fil;
 FRESULT fres;
 
@@ -169,7 +169,6 @@ int main() {
             while(button_pressed(BUTTON_K1));
             analyze_dipstick_paper();
         }
-        
         
     }
 }
