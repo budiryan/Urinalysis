@@ -2,170 +2,117 @@
 
 static bool capture_cam = false;
 char str[40];
-bool CONTINUOUS_MODE = true;
-u8 switch_motor_running = 0;
-u8 switch_pump_running = 1;
-static volatile u8 current_time = 0;
-STEPPER_DIRECTION current_motor_direction = STEPPER_CW;
-PUMP_DIRECTION current_pump_direction = CW;
 uint32_t pump_time_stamp;
-uint32_t motor_time_stamp;
-u8 count = 0;
-#define PUMP_DURATION 57
-#define MOTOR_DURATION_MS 1069
-#define ROTATION_COUNT 8
-
-//Fatfs object
-FATFS FatFs;
-FIL fil;
-FRESULT fres;
-
-void begin_pump(void){
-    // Pump for some seconds
-    pump_time_stamp = get_seconds();
-    TM_ILI9341_Puts(180, 20, "           ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    TM_ILI9341_Puts(180, 20, "PUMPING", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    TM_ILI9341_Puts(180, 40, "   ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    while ((get_seconds() - pump_time_stamp) < PUMP_DURATION){
-        TM_ILI9341_Puts(180, 40, itoa(get_seconds() - pump_time_stamp, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-        pump(400, CCW);
-    }
-    // After some second, stop
-    pump(0, CCW);
-}
-
-void clean_pump(void){
-    // Pump for some seconds
-    pump_time_stamp = get_seconds();
-    TM_ILI9341_Puts(180, 20, "           ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    TM_ILI9341_Puts(180, 20, "CLEAN PUMP", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    TM_ILI9341_Puts(180, 40, "   ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    while ((get_seconds() - pump_time_stamp) < PUMP_DURATION){
-        TM_ILI9341_Puts(180, 40, itoa(get_seconds() - pump_time_stamp, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-        pump(400, CW); // only direction is different now...
-    }
-    // After some second, stop
-    pump(0, CW);
-}
-
-void rotate_all_section(void){
-    motor_time_stamp = get_full_ticks();
-    TM_ILI9341_Puts(180, 20, "            ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    TM_ILI9341_Puts(180, 20, "ROTATING", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    pump(0, CW);
-    /*
-    while ((get_full_ticks() - motor_time_stamp) < MOTOR_DURATION_MS){
-        // TM_ILI9341_Puts(180, 80, itoa(get_seconds(), str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2);
-        stepper_spin(STEPPER_CW, 300);
-    }
-    */
-    stepper_spin(STEPPER_CW, 300);
-    delay_ms(MOTOR_DURATION_MS);
-    // After some second, stop
-    stepper_spin(STEPPER_CW, 0);
-}
-
-void init(){
-    SystemInit();
-    led_init();			//Initiate LED
-    pump_init();
-    button_init();
-    stepper_init();
-    // Stepper motor's speed does not depend on duty cycle of the pwm
-	ticks_init();		//Ticks initialization --> to get seconds etc
-    delay_init();
-    TM_ILI9341_Init();
-    TM_ILI9341_Fill(ILI9341_COLOR_WHITE);
-    TM_ILI9341_Rotate(TM_ILI9341_Orientation_Landscape_1);
-    pump(400, CCW);
-    stepper_spin(STEPPER_CCW, 400);
-    uart_init(COM3, 9600);
-    uart_tx(COM3, "MEMEKZ\n");
-    
-}
-
-void analyze_dipstick_paper(){
-    delay_ms(1000);
-    TM_ILI9341_DisplayImage((u16 *) frame_buffer);
-    TM_ILI9341_Puts(180, 20, "Analyzing", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    display_color_average((u16 *)segmentation, 25, RGB565);
-    delay_ms(1500);
-    TM_ILI9341_Puts(180, 20, "         ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-}
-
-void sd_transfer_data(){
-    fres = f_mount(&FatFs, "", 1);
-    //TM_ILI9341_Puts(180, 0, itoa(fres, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    
-    fres = f_open(&fil, "result4.txt", FA_OPEN_ALWAYS | FA_READ | FA_WRITE);
-    //TM_ILI9341_Puts(180, 20, itoa(fres, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    
-    fres = f_write(&fil, "Budi Ryan", 10, NULL);
-    
-    fres = f_close(&fil);
-    TM_ILI9341_Puts(180, 40, itoa(fres, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);    
-    
-    f_mount(0, "", 1);
-    
-}
+URINALYSIS_PROCESS process = IDLE;
+#define PUMP_DURATION 96
+// #define PUMP_DURATION 10
+#define MOTOR_DURATION_US 763100
+#define MINI_PUMP_DURATION 1600
+#define ROTATION_COUNT 4
 
 int main() {
-    init();
-    /* FOR COMPLETE PIN MAPPING INFORMATION: GO TO 'doc/pin_mapping.txt'----------*/
-
-    
-    // int status = 0;
+    init_system();
     TM_ILI9341_Puts(0, 0, "Live Feed:", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    
     TM_ILI9341_Puts(180, 0, "STATUS: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     TM_ILI9341_Puts(180, 20, "Idle ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    /*
-    float test_a = powf(9.345323, 2.1);
-    
-    COLOR_OBJECT test = {146, 156, 50, 0};
-    test.score = interpolate(test);
-    sprintf(str, "%.2f", test.score);
-    TM_ILI9341_Puts(0, 160, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    */
-    
-
-    
-    OV9655_Configuration();
-    DCMI_CaptureCmd(ENABLE);
-    sd_transfer_data();
+    int sd_result;
+    sd_result = sd_transfer_data();
+    //if(sd_result == 0)
+     //   TM_ILI9341_Puts(180, 60, "SD card save!", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    //else
+     //   TM_ILI9341_Puts(180, 60, "SD card fail!", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     while(true){
         if (capture_cam == true) {
              capture_cam = false;
              TM_ILI9341_DisplayImage((u16 *) frame_buffer);
         }
-        /*
-        if(button_pressed(BUTTON_K0)){
-            // Analyze the image in 1 press of a button
-            while(button_pressed(BUTTON_K0));
-            begin_pump();
-            TM_ILI9341_Puts(180, 20, "            ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-            TM_ILI9341_Puts(180, 20, "DONE PUMPING", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-            TM_ILI9341_Puts(180, 40, "            ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-            
-            // Rotate to distribute the urine evenly
-            // for (int i  = 0 ; i < ROTATION_COUNT ; i++){
-            //    rotate_all_section();
-            //    pump(400, CCW);
-            //}
-            analyze_dipstick_paper();
-            clean_pump();
-            TM_ILI9341_Puts(180, 20, "            ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-            TM_ILI9341_Puts(180, 20, "PUMP CLEAN", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-            TM_ILI9341_Puts(180, 20, "            ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-            TM_ILI9341_Puts(180, 40, "            ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-            
-        }
-        */
         if(button_pressed(BUTTON_K1)){
             // Capture one time and display analysis
             while(button_pressed(BUTTON_K1));
             analyze_dipstick_paper();
         }
+        if(button_pressed(BUTTON_K0)){
+            process = PUMP_URINE;
+            pump_time_stamp = get_seconds();
+        }
+        // pump(400, CW);
+        
+        switch(process){
+            case PUMP_URINE:
+                clear_counter();
+                TM_ILI9341_Puts(180, 20, "PUMP URINE", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+                sprintf(str, "%d", get_seconds() - pump_time_stamp);
+                TM_ILI9341_Puts(180, 40, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+                if(get_seconds() - pump_time_stamp < PUMP_DURATION)
+                    pump(400, CCW);
+                else{
+                    // process = ROTATE_MOTOR;
+                    process = ROTATE_MOTOR;
+                    pump(0, CW);
+                }
+            break;
+            case ROTATE_MOTOR:
+                clear_counter();
+                TM_ILI9341_Puts(180, 20, "            ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+                TM_ILI9341_Puts(180, 40, "    ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+                TM_ILI9341_Puts(180, 20, "ROTATE", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+                for(int i = 0; i < ROTATION_COUNT; i++){
+                    sprintf(str, "%d", i + 1);
+                    TM_ILI9341_Puts(180, 40, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+                    pump(0, CCW);
+                    stepper_spin(STEPPER_CW, 300);
+                    delay_us(2 * MOTOR_DURATION_US);
+                    // After some second, stop
+                    stepper_spin(STEPPER_CW, 0);
+                    pump(400, CCW);
+                    delay_ms(MINI_PUMP_DURATION);
+                }
+                process = PERFORM_ANALYSIS;
+            break;
+            case PERFORM_ANALYSIS:
+                clear_counter();
+                TM_ILI9341_Puts(100, 160, "             ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+                TM_ILI9341_Puts(180, 20, "ANALYZING", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+                analyze_dipstick_paper();
+                process = CLEAN_PUMP;
+                pump_time_stamp = get_seconds();
+            break;
+            case CLEAN_PUMP:
+                clear_counter();
+                TM_ILI9341_Puts(180, 20, "CLEAN PUMP", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+                sprintf(str, "%d", get_seconds() - pump_time_stamp);
+                TM_ILI9341_Puts(180, 40, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+                if(get_seconds() - pump_time_stamp < PUMP_DURATION)
+                    pump(400, CW);
+                else{
+                    process = ALERT_BLUETOOTH;
+                    pump(0, CW);
+                }
+            break;
+            case ALERT_BLUETOOTH:
+                clear_counter();
+                TM_ILI9341_Puts(180, 20, "BLUETOOTH", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+                send_bluetooth();
+                process = SAVE_TO_SD_CARD;
+                clear_counter();
+            break;
+            case SAVE_TO_SD_CARD:
+                TM_ILI9341_Puts(180, 20, "SAVE SD", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+                TM_ILI9341_Puts(180, 60, "             ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+                sd_result = sd_transfer_data();
+                if(sd_result == 0)
+                    TM_ILI9341_Puts(180, 60, "SD card save!", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+                else
+                    TM_ILI9341_Puts(180, 60, "SD card fail!", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+                process = IDLE;
+                clear_counter();
+            break;
+            case IDLE:
+                // do nothing, rofl
+                TM_ILI9341_Puts(180, 20, "IDLE", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+            break;
+        }
+        
         
     }
 }

@@ -13,7 +13,7 @@
 
 #define CAMERA_COLUMNS          160
 #define CAMERA_ROWS             120
-#define START_SEGMENT_ROWS      40
+#define START_SEGMENT_ROWS      50
 #define START_SEGMENT_COLUMNS   75
 #define SEGMENT_ROWS            5
 #define SEGMENT_COLUMNS         5
@@ -41,11 +41,6 @@ float RGB_color_Lab_difference_CIE76(COLOR_OBJECT color1, COLOR_OBJECT color2);
 float Lab_color_difference_CIE94( float inL1, float ina1, float  inb1, float inL2, float ina2, float  inb2);
 float RGB_color_Lab_difference_CIE94( int R1, int G1, int B1, int R2, int G2, int B2);
 
-
-char * itoa (int value, char *result, int base);
-void display_color_average(u16 image[], u16 array_length, COLOR_TYPE color);
-void capture_one_time(void);
-
-
+void display_analysis(u16 image[], u16 array_length, COLOR_TYPE color);
 
 #endif

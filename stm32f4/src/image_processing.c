@@ -90,7 +90,7 @@ float interpolate(COLOR_OBJECT test_data){
     COLOR_OBJECT ref_data[NUM_REFERENCE] = {ref1, ref2, ref3, ref4, ref5, ref6};
     float ref_dist[NUM_STAGE];
     float test_ref_dist[NUM_REFERENCE];
-    int idx_n, stage, idx_b, idx_c;
+    int idx_n,idx_b, idx_c;
     float cx, bx, final_score;
    
     // Calculate the distance within reference data
@@ -102,7 +102,7 @@ float interpolate(COLOR_OBJECT test_data){
     for(int i=0; i < NUM_REFERENCE; i++){
         test_ref_dist[i] = RGB_color_Lab_difference_CIE76(test_data, ref_data[i]);
     }
-    /* DEBUG
+    /* USEFUL FOR DEBUGGING
     sprintf(str, "%.2f\n%.2f\n%.2f\n%.2f\n%.2f\n%.2f",test_ref_dist[0],test_ref_dist[1],test_ref_dist[2],test_ref_dist[3],test_ref_dist[4],test_ref_dist[5]);
     TM_ILI9341_Puts(180, 40, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     sprintf(str, "%.2f\n%.2f\n%.2f\n%.2f\n%.2f",ref_dist[0],ref_dist[1],ref_dist[2],ref_dist[3],ref_dist[4]);
@@ -125,7 +125,7 @@ float interpolate(COLOR_OBJECT test_data){
     }
     */
     // use trigonometry formula to find cx
-    cx = ((test_ref_dist[idx_b] * test_ref_dist[idx_b]) - (ref_dist[idx_b] * ref_dist[idx_b]) - (test_ref_dist[idx_c] * test_ref_dist[idx_c])) / (-2.0f * ref_dist[idx_b]);
+    cx = (powf(test_ref_dist[idx_b], 2.0f) - powf(ref_dist[idx_b], 2.0f) - powf(test_ref_dist[idx_c], 2.0f)) / (-2.0f * ref_dist[idx_b]);
     // score of the test data is finally evaluated
     bx = ref_dist[idx_b] - cx;
     final_score = ((bx / ref_dist[idx_b]) * (float)(ref_data[idx_c].score - ref_data[idx_b].score)) + ref_data[idx_b].score;
@@ -409,75 +409,18 @@ float RGB_color_Lab_difference_CIE94( int R1, int G1, int B1, int R2, int G2, in
 	convertRGBtoXYZ(R2, G2, B2, &x2, &x2, &z2);
 
 	convertXYZtoLab(x1, y1, z1, &l1, &a1, &b1);
-	convertXYZtoLab(x2, y2, z2, &l2, &a2, &b2); 
+	convertXYZtoLab(x2, y2, z2, &l2, &a2, &b2);  
 
 	return( Lab_color_difference_CIE94(l1 ,a1 ,b1 ,l2 ,a2 ,b2) );
 }
 
-
-/* Converts an integer to char array */
-char * itoa (int value, char *result, int base)
-{
-    // check that the base if valid
-    if (base < 2 || base > 36) { *result = '\0'; return result; }
-
-    char* ptr = result, *ptr1 = result, tmp_char;
-    int tmp_value;
-
-    do {
-        tmp_value = value;
-        value /= base;
-        *ptr++ = "zyxwvutsrqponmlkjihgfedcba9876543210123456789abcdefghijklmnopqrstuvwxyz" [35 + (tmp_value - value * base)];
-    } while ( value );
-
-    // Apply negative sign
-    if (tmp_value < 0) *ptr++ = '-';
-    *ptr-- = '\0';
-    while (ptr1 < ptr) {
-        tmp_char = *ptr;
-        *ptr--= *ptr1;
-        *ptr1++ = tmp_char;
-    }
-    return result;
-}
-
 // Displays the average of each color channel, given an image array
-void display_color_average(u16 image[], u16 array_length, COLOR_TYPE color){
+void display_analysis(u16 image[], u16 array_length, COLOR_TYPE color){
     uint64_t r = 0;
     uint64_t g = 0;
     uint64_t b = 0;
     uint64_t temp = 0;
     uint64_t overall = 0;
-    
-    // Reference colors
-    //uint16_t glucose_neg = 0xFFAF;
-     uint16_t glucose_neg = 0x8645;
-    // uint64_t glucose_normal = 0x8645;
-    // uint64_t glucose_50 = 0x056B;
-    // uint64_t glucose_150 = 0x044E;
-    // uint64_t glucose_500 = 0x12EB;
-    uint16_t glucose_1000 = 0x2228;
-    
-    uint16_t glucose_neg_r = (glucose_neg & 0xF800) >> 11;
-    uint16_t glucose_neg_g = (glucose_neg & 0x7E0) >> 5;
-    glucose_neg_g = glucose_neg_g / (float)64.0 * (float)32.0;
-    uint16_t glucose_neg_b = glucose_neg & 0x1F;
-    
-    uint16_t glucose_1000_r = (glucose_1000 & 0xF800) >> 11;
-    uint16_t glucose_1000_g = (glucose_1000 & 0x7E0) >> 5;
-    glucose_1000_g = glucose_1000_g / (float)64.0 * (float)32.0;
-    uint16_t glucose_1000_b = glucose_1000 & 0x1F;
-    
-    int32_t diff_neg_r;
-    int32_t diff_neg_g;
-    int32_t diff_neg_b;
-    int32_t diff_neg;
-    
-    int32_t diff_1000_r;
-    int32_t diff_1000_g;
-    int32_t diff_1000_b;
-    int32_t diff_1000;
-    int32_t glucose_detected = 0;
    
     switch(color){
         case RGB555:
@@ -536,17 +479,8 @@ void display_color_average(u16 image[], u16 array_length, COLOR_TYPE color){
     TM_ILI9341_Puts(20, 180, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     
     
-    TM_ILI9341_Puts(0, 200, "score:", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    interpolation_score = interpolate(test);
-    //TM_ILI9341_Puts(0, 220, "                             ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    TM_ILI9341_Puts(100, 140, "glucose score:", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    interpolation_score = interpolate(test) > 0 ? interpolate(test) : 0;
     sprintf(str, "%.2f", interpolation_score);
-    // TM_ILI9341_DrawFilledRectangle(0, 220, 20, 240, overall);
-    TM_ILI9341_Puts(0, 220, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-}
-
-void capture_one_time(void){
-    DCMI_CaptureCmd(ENABLE);
-    // TM_ILI9341_DisplayImage((uint16_t*) frame_buffer);
-    _delay_ms(500);
-    DCMI_CaptureCmd(DISABLE);
+    TM_ILI9341_Puts(100, 160, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
 }
