@@ -23,6 +23,7 @@ extern char str[100];
 float ref_x = 95.047;
 float ref_y = 100.0;
 float ref_z = 108.883;
+float interpolation_score;
 volatile u16 segmentation[SEGMENT_ROWS * SEGMENT_COLUMNS];
 volatile uint16_t frame_buffer[CAMERA_ROWS * CAMERA_COLUMNS];
 
@@ -456,7 +457,6 @@ void display_analysis(u16 image[], u16 array_length, COLOR_TYPE color){
     // convert to cie lab
     float X, Y, Z;
     float L, A, B;
-    float interpolation_score;
     // convert r, g, b to 255 scale
     r = r / 32.0f * 255.0f;
     g = g / 32.0f * 255.0f;

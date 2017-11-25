@@ -6,21 +6,18 @@ uint32_t pump_time_stamp;
 URINALYSIS_PROCESS process = IDLE;
 #define PUMP_DURATION 96
 // #define PUMP_DURATION 10
-#define MOTOR_DURATION_US 763100
-#define MINI_PUMP_DURATION 1600
-#define ROTATION_COUNT 4
+#define MOTOR_DURATION_US 763000
+#define MINI_PUMP_DURATION 2000
+#define ROTATION_COUNT 5
 
 int main() {
     init_system();
     TM_ILI9341_Puts(0, 0, "Live Feed:", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     TM_ILI9341_Puts(180, 0, "STATUS: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     TM_ILI9341_Puts(180, 20, "Idle ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    uart_tx(COM3, "GROUP 22: Home-Based Urinalysis System\n");
     int sd_result;
-    sd_result = sd_transfer_data();
-    //if(sd_result == 0)
-     //   TM_ILI9341_Puts(180, 60, "SD card save!", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    //else
-     //   TM_ILI9341_Puts(180, 60, "SD card fail!", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    sd_transfer_data();
     while(true){
         if (capture_cam == true) {
              capture_cam = false;
@@ -61,12 +58,15 @@ int main() {
                     TM_ILI9341_Puts(180, 40, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
                     pump(0, CCW);
                     stepper_spin(STEPPER_CW, 300);
-                    delay_us(2 * MOTOR_DURATION_US);
+                    delay_us(3 * MOTOR_DURATION_US);
                     // After some second, stop
                     stepper_spin(STEPPER_CW, 0);
                     pump(400, CCW);
                     delay_ms(MINI_PUMP_DURATION);
                 }
+                // wait 1 sec to let the urine flows
+                pump(0, CCW);
+                delay_ms(1000);
                 process = PERFORM_ANALYSIS;
             break;
             case PERFORM_ANALYSIS:
@@ -74,7 +74,25 @@ int main() {
                 TM_ILI9341_Puts(100, 160, "             ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
                 TM_ILI9341_Puts(180, 20, "ANALYZING", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
                 analyze_dipstick_paper();
+                process = ALERT_BLUETOOTH;
+                
+            break;
+            case ALERT_BLUETOOTH:
+                clear_counter();
+                TM_ILI9341_Puts(180, 20, "BLUETOOTH", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+                send_bluetooth();
+                process = SAVE_TO_SD_CARD;
+            break;
+            case SAVE_TO_SD_CARD:
+                TM_ILI9341_Puts(180, 20, "SAVE SD", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+                TM_ILI9341_Puts(180, 60, "             ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+                sd_result = sd_transfer_data();
+                if(sd_result == 0)
+                    TM_ILI9341_Puts(180, 60, "SD card save!", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+                else
+                    TM_ILI9341_Puts(180, 60, "SD card fail!", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
                 process = CLEAN_PUMP;
+                clear_counter();
                 pump_time_stamp = get_seconds();
             break;
             case CLEAN_PUMP:
@@ -85,30 +103,13 @@ int main() {
                 if(get_seconds() - pump_time_stamp < PUMP_DURATION)
                     pump(400, CW);
                 else{
-                    process = ALERT_BLUETOOTH;
+                    process = IDLE;
                     pump(0, CW);
                 }
             break;
-            case ALERT_BLUETOOTH:
-                clear_counter();
-                TM_ILI9341_Puts(180, 20, "BLUETOOTH", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-                send_bluetooth();
-                process = SAVE_TO_SD_CARD;
-                clear_counter();
-            break;
-            case SAVE_TO_SD_CARD:
-                TM_ILI9341_Puts(180, 20, "SAVE SD", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-                TM_ILI9341_Puts(180, 60, "             ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-                sd_result = sd_transfer_data();
-                if(sd_result == 0)
-                    TM_ILI9341_Puts(180, 60, "SD card save!", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-                else
-                    TM_ILI9341_Puts(180, 60, "SD card fail!", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-                process = IDLE;
-                clear_counter();
-            break;
             case IDLE:
                 // do nothing, rofl
+                clear_counter();
                 TM_ILI9341_Puts(180, 20, "IDLE", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
             break;
         }

@@ -4,6 +4,7 @@
 FATFS FatFs;
 FIL fil;
 FRESULT fres;
+extern float interpolation_score;
 extern char str[40];
 
 void init_system(void){
@@ -62,11 +63,11 @@ int sd_transfer_data(){
     fres = f_mount(&FatFs, "", 1);
     sprintf(str, "SD card 1: %d", fres);
     TM_ILI9341_Puts(180, 60, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);   
-    //TM_ILI9341_Puts(180, 0, itoa(fres, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    TM_ILI9341_Puts(180, 0, itoa(fres, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     fres = f_open(&fil, "result4.txt", FA_OPEN_ALWAYS | FA_READ | FA_WRITE);
     sprintf(str, "SD card 2: %d", fres);
     TM_ILI9341_Puts(180, 80, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);   
-    //TM_ILI9341_Puts(180, 20, itoa(fres, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    TM_ILI9341_Puts(180, 20, itoa(fres, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     fres = f_write(&fil, "Budi Ryan", 10, NULL);
     sprintf(str, "SD card 3: %d", fres);
     TM_ILI9341_Puts(180, 100, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);   
@@ -93,8 +94,10 @@ int sd_transfer_data(){
 }
 
 void send_bluetooth(){
-    delay_ms(500);
-    uart_tx(COM3, "GLUCOSE IS HIGH\n");
+    if (interpolation_score > 20)
+        uart_tx(COM3, "ALERT! Glucose level is high! it is at %.3f mg/dL \n", interpolation_score);
+    else
+        uart_tx(COM3, "Glucose level is normal at: %.3f mg/dL", interpolation_score);
 }
 
 void clear_counter(){
