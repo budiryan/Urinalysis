@@ -9,13 +9,23 @@ This reference colors are from the original paper
 #define REF6_VAL {90, 40, 13, 2000.0}
 */
 
-// Reference color from real environment --> mg / dL
+// Reference color from real environment --> mg / dL --> in JCH
+/*
 #define REF1_VAL {175, 167, 127, 0}
 #define REF2_VAL {135, 159, 119, 15}
 #define REF3_VAL {95, 151, 119, 50}
 #define REF4_VAL {79, 135, 119, 150}
 #define REF5_VAL {71, 103, 87, 500}
 #define REF6_VAL {44, 71, 63, 1000}
+*/
+// Reference color from real environment --> mg / dL --> in Room 3115
+#define REF1_VAL {175, 167, 135, 0}
+#define REF2_VAL {135, 159, 127, 15}
+#define REF3_VAL {95, 135, 103, 50}
+#define REF4_VAL {71, 111, 95, 150}
+#define REF5_VAL {63, 87, 79, 500}
+#define REF6_VAL {47, 55, 55, 1000}
+
 
 
 // Constants used for rgb transformation
@@ -112,19 +122,6 @@ float interpolate(COLOR_OBJECT test_data){
     idx_n = smallest_arg(test_ref_dist, NUM_STAGE);
     
     assign_interpolation_index(&idx_b, &idx_c, idx_n, NUM_REFERENCE, ref_dist, test_ref_dist);
-    // test data is out of range
-    /*
-    if (idx_b < 0 || idx_c < 0){
-        TM_ILI9341_Puts(0, 180, "Fail 1", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-        return -1;
-    }
-     
-    // another error checking here
-    if ((test_ref_dist[idx_b] > ref_dist[idx_b]) || (test_ref_dist[idx_c] > ref_dist[idx_b])){
-        TM_ILI9341_Puts(0, 180, "Fail 2", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-        return -1;
-    }
-    */
     // use trigonometry formula to find cx
     cx = (powf(test_ref_dist[idx_b], 2.0f) - powf(ref_dist[idx_b], 2.0f) - powf(test_ref_dist[idx_c], 2.0f)) / (-2.0f * ref_dist[idx_b]);
     // score of the test data is finally evaluated
@@ -471,11 +468,11 @@ void display_analysis(u16 image[], u16 array_length, COLOR_TYPE color){
     TM_ILI9341_Puts(0, 160, "A: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     TM_ILI9341_Puts(0, 180, "B: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     
-    sprintf(str, "%.2f", L);
+    sprintf(str, "%d", r);
     TM_ILI9341_Puts(20, 140, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    sprintf(str, "%.2f", A);
+    sprintf(str, "%d", g);
     TM_ILI9341_Puts(20, 160, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    sprintf(str, "%.2f", B);
+    sprintf(str, "%d", b);
     TM_ILI9341_Puts(20, 180, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     
     

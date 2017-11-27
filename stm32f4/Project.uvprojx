@@ -806,6 +806,11 @@
               <FileType>1</FileType>
               <FilePath>.\src\OV9655.c</FilePath>
             </File>
+            <File>
+              <FileName>urinalysis.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\urinalysis.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

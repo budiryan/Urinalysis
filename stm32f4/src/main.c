@@ -4,21 +4,39 @@ static bool capture_cam = false;
 char str[40];
 uint32_t pump_time_stamp;
 URINALYSIS_PROCESS process = IDLE;
-#define PUMP_DURATION 96
-// #define PUMP_DURATION 10
-#define MOTOR_DURATION_US 763000
-#define MINI_PUMP_DURATION 2000
-#define ROTATION_COUNT 5
+#define PUMP_DURATION 105
+#define MOTOR_DURATION_US 762500
+#define MINI_PUMP_DURATION 2100
+#define ROTATION_COUNT 1
+#define WAIT_DURATION 6000
+//Fatfs object
+FATFS FatFs;
+FIL fil;
+FRESULT fres;
 
 int main() {
     init_system();
     TM_ILI9341_Puts(0, 0, "Live Feed:", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     TM_ILI9341_Puts(180, 0, "STATUS: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    TM_ILI9341_Puts(180, 20, "Idle ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     uart_tx(COM3, "GROUP 22: Home-Based Urinalysis System\n");
     int sd_result;
-    sd_transfer_data();
+    // sd_transfer_data();
+    fres = f_mount(&FatFs, "", 1);
+    // sprintf(str, "SD card 1: %d", fres);
+    // TM_ILI9341_Puts(180, 60, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);   
+    fres = f_open(&fil, "result4.txt", FA_OPEN_ALWAYS | FA_READ | FA_WRITE);
+    // sprintf(str, "SD card 2: %d", fres);
+    // TM_ILI9341_Puts(180, 80, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);   
+    fres = f_write(&fil, "Budi Ryan", 10, NULL);
+    // sprintf(str, "SD card 3: %d", fres);
+    // TM_ILI9341_Puts(180, 100, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);   
+    fres = f_close(&fil);
+    //sprintf(str, "SD card 4: %d", fres);
+    // TM_ILI9341_Puts(180, 120, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);    
+    f_mount(0, "", 1);
     while(true){
+        // pump(400, CCW);
+        
         if (capture_cam == true) {
              capture_cam = false;
              TM_ILI9341_DisplayImage((u16 *) frame_buffer);
@@ -64,9 +82,10 @@ int main() {
                     pump(400, CCW);
                     delay_ms(MINI_PUMP_DURATION);
                 }
-                // wait 1 sec to let the urine flows
+                // wait 4 sec to let the urine flows
                 pump(0, CCW);
-                delay_ms(1000);
+                TM_ILI9341_Puts(180, 20, "WAIT   ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+                delay_ms(WAIT_DURATION);
                 process = PERFORM_ANALYSIS;
             break;
             case PERFORM_ANALYSIS:
@@ -87,10 +106,10 @@ int main() {
                 TM_ILI9341_Puts(180, 20, "SAVE SD", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
                 TM_ILI9341_Puts(180, 60, "             ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
                 sd_result = sd_transfer_data();
-                if(sd_result == 0)
-                    TM_ILI9341_Puts(180, 60, "SD card save!", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-                else
-                    TM_ILI9341_Puts(180, 60, "SD card fail!", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+                //if(sd_result == 0)
+                //    TM_ILI9341_Puts(180, 60, "SD card save!", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+                //else
+                //    TM_ILI9341_Puts(180, 60, "SD card fail!", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
                 process = CLEAN_PUMP;
                 clear_counter();
                 pump_time_stamp = get_seconds();
@@ -113,8 +132,7 @@ int main() {
                 TM_ILI9341_Puts(180, 20, "IDLE", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
             break;
         }
-        
-        
+ 
     }
 }
 
