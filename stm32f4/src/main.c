@@ -1,6 +1,7 @@
 #include "main.h"
 
 static bool capture_cam = false;
+extern float interpolation_score;
 char str[40];
 uint32_t pump_time_stamp;
 URINALYSIS_PROCESS process = IDLE;
@@ -9,34 +10,16 @@ URINALYSIS_PROCESS process = IDLE;
 #define MINI_PUMP_DURATION 2100
 #define ROTATION_COUNT 1
 #define WAIT_DURATION 6000
-//Fatfs object
-FATFS FatFs;
-FIL fil;
-FRESULT fres;
 
 int main() {
     init_system();
     TM_ILI9341_Puts(0, 0, "Live Feed:", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     TM_ILI9341_Puts(180, 0, "STATUS: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     uart_tx(COM3, "GROUP 22: Home-Based Urinalysis System\n");
-    int sd_result;
-    // sd_transfer_data();
-    fres = f_mount(&FatFs, "", 1);
-    // sprintf(str, "SD card 1: %d", fres);
-    // TM_ILI9341_Puts(180, 60, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);   
-    fres = f_open(&fil, "result4.txt", FA_OPEN_ALWAYS | FA_READ | FA_WRITE);
-    // sprintf(str, "SD card 2: %d", fres);
-    // TM_ILI9341_Puts(180, 80, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);   
-    fres = f_write(&fil, "Budi Ryan", 10, NULL);
-    // sprintf(str, "SD card 3: %d", fres);
-    // TM_ILI9341_Puts(180, 100, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);   
-    fres = f_close(&fil);
-    //sprintf(str, "SD card 4: %d", fres);
-    // TM_ILI9341_Puts(180, 120, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);    
-    f_mount(0, "", 1);
+    sd_test_init();
+    
+    
     while(true){
-        // pump(400, CCW);
-        
         if (capture_cam == true) {
              capture_cam = false;
              TM_ILI9341_DisplayImage((u16 *) frame_buffer);
@@ -45,12 +28,12 @@ int main() {
             // Capture one time and display analysis
             while(button_pressed(BUTTON_K1));
             analyze_dipstick_paper();
+            sd_transfer_data(interpolation_score);
         }
         if(button_pressed(BUTTON_K0)){
             process = PUMP_URINE;
             pump_time_stamp = get_seconds();
         }
-        // pump(400, CW);
         
         switch(process){
             case PUMP_URINE:
@@ -104,12 +87,7 @@ int main() {
             break;
             case SAVE_TO_SD_CARD:
                 TM_ILI9341_Puts(180, 20, "SAVE SD", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-                TM_ILI9341_Puts(180, 60, "             ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-                sd_result = sd_transfer_data();
-                //if(sd_result == 0)
-                //    TM_ILI9341_Puts(180, 60, "SD card save!", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-                //else
-                //    TM_ILI9341_Puts(180, 60, "SD card fail!", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+                sd_transfer_data(interpolation_score);
                 process = CLEAN_PUMP;
                 clear_counter();
                 pump_time_stamp = get_seconds();

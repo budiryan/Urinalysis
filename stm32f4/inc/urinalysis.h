@@ -18,7 +18,8 @@ typedef enum{
 void init_system(void);
 char * itoa (int value, char *result, int base);
 void analyze_dipstick_paper(void);
-int sd_transfer_data(void);
+void sd_transfer_data(float interpolation_score);
 void send_bluetooth(void);
 void clear_counter(void);
+void sd_test_init(void);
 #endif

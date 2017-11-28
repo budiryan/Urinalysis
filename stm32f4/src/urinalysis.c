@@ -1,13 +1,11 @@
 #include "urinalysis.h"
 
+extern float interpolation_score;
+extern char str[40];
 //Fatfs object
-/*
 FATFS FatFs;
 FIL fil;
 FRESULT fres;
-*/
-extern float interpolation_score;
-extern char str[40];
 
 void init_system(void){
     SystemInit();
@@ -23,6 +21,21 @@ void init_system(void){
     uart_init(COM3, 9600);
     OV9655_Configuration();
     DCMI_CaptureCmd(ENABLE);
+}
+
+FRESULT open_append (FIL* fp, const char* path)
+{
+    FRESULT fr;
+
+    // Opens an existing file. If not exist, creates a new file.
+    fr = f_open(fp, path, FA_WRITE | FA_OPEN_ALWAYS);
+    if (fr == FR_OK) {
+        // Seek to end of the file to append data
+        fr = f_lseek(fp, f_size(fp));
+        if (fr != FR_OK)
+            f_close(fp);
+    }
+    return fr;
 }
 
 /* Converts an integer to char array */
@@ -60,44 +73,45 @@ void analyze_dipstick_paper(){
     TM_ILI9341_Puts(180, 20, "         ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
 }
 
-int sd_transfer_data(){
-    /*
-    fres = f_mount(&FatFs, "bbb", 1);
-    sprintf(str, "SD card 1: %d", fres);
-    TM_ILI9341_Puts(180, 60, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);   
-    fres = f_open(&fil, "result4.txt", FA_OPEN_ALWAYS | FA_READ | FA_WRITE);
-    sprintf(str, "SD card 2: %d", fres);
-    TM_ILI9341_Puts(180, 80, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);   
-    fres = f_write(&fil, "Budi Ryan", 10, NULL);
-    sprintf(str, "SD card 3: %d", fres);
-    TM_ILI9341_Puts(180, 100, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);   
-    fres = f_close(&fil);
-    sprintf(str, "SD card 4: %d", fres);
-    TM_ILI9341_Puts(180, 120, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);    
-    f_mount(0, "", 1);
-    return 0;
-    */
-    /* Open or create a log file and ready to append */
+
+
+void sd_transfer_data(float interpolation_score){
+    TM_ILI9341_Puts(180, 200, "                ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    fres = f_mount(&FatFs, "", 1);
+    TM_ILI9341_Puts(180, 200, "SD:", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    TM_ILI9341_Puts(210, 200, itoa(fres, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     
-    /*
-    f_mount(&FatFs, "", 0);
-    fres = open_append(&fil, "logfile.txt");
-    if (fres != FR_OK) return 1;
+    // Open or create a log file and ready to append
+    fres = open_append(&fil, "result.txt");
+    TM_ILI9341_Puts(225, 200, itoa(fres, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
 
     // Append a line
-    f_printf(&fil, "Test append line");
-
+    sprintf(str, "Glucose: %.3f mg/dL\n", interpolation_score);
+    f_printf(&fil, str);
+    TM_ILI9341_Puts(240, 200, itoa(fres, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    
     // Close the file
-    f_close(&fil);
-    return 0;
-    */
+    fres = f_close(&fil);
+    TM_ILI9341_Puts(255, 200, itoa(fres, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+
+    fres = f_mount(0, "", 1);
+}
+
+void sd_test_init(void){
+    fres = f_mount(&FatFs, "", 1);
+    TM_ILI9341_Puts(180, 200, "SD:", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    TM_ILI9341_Puts(210, 200, itoa(fres, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+
+    fres = f_mount(0, "", 1);
+    TM_ILI9341_Puts(255, 200, itoa(fres, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
 }
 
 void send_bluetooth(){
+    TM_ILI9341_Puts(180, 200, "BT trans OK", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     if (interpolation_score > 20)
         uart_tx(COM3, "ALERT! Glucose level is high! it is at %.3f mg/dL \n", interpolation_score);
     else
-        uart_tx(COM3, "Glucose level is normal at: %.3f mg/dL", interpolation_score);
+        uart_tx(COM3, "Glucose level is normal at: %.3f mg/dL \n", interpolation_score);
 }
 
 void clear_counter(){
