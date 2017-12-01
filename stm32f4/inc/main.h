@@ -38,8 +38,6 @@
 #include "stm32f4xx_dma2d.h"
 #include "usart.h"
 #include "approx_math.h"
-#include "buzzer.h"
-#include "infrared_sensor.h"
 #include "ticks.h"
 #include "delay.h"
 #include "button.h"

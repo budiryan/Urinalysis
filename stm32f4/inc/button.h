@@ -4,7 +4,6 @@
 #include "stm32f4xx.h"
 #include "stm32f4xx_gpio.h"
 #include <stdbool.h>
-#include "tft_display.h"
 #include "main.h"
 
 #define BUTTON_GPIO     GPIOE

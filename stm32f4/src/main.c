@@ -1,5 +1,13 @@
 #include "main.h"
 
+
+/*
+ACKNOWLEDGEMENT:
+I fully acknowledge third party sources I have used while developing the project:
+- Tilen Majerle for controlling the LCD Monitor
+- ChaN for the Micro SD card library
+*/
+
 static bool capture_cam = false;
 extern float interpolation_score;
 char str[40];
