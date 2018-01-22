@@ -99,11 +99,11 @@ void sd_transfer_data(float interpolation_score){
 
 void sd_test_init(void){
     fres = f_mount(&FatFs, "", 1);
-    TM_ILI9341_Puts(180, 200, "SD:", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    TM_ILI9341_Puts(210, 200, itoa(fres, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    // TM_ILI9341_Puts(180, 200, "SD:", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    // TM_ILI9341_Puts(210, 200, itoa(fres, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
 
     fres = f_mount(0, "", 1);
-    TM_ILI9341_Puts(255, 200, itoa(fres, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    // TM_ILI9341_Puts(255, 200, itoa(fres, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
 }
 
 void send_bluetooth(){

@@ -44,6 +44,22 @@ COLOR_OBJECT ref4 = REF4_VAL;
 COLOR_OBJECT ref5 = REF5_VAL;
 COLOR_OBJECT ref6 = REF6_VAL;
 
+
+s16 calculate_angle(float u1, float v1, float w1, float u2, float v2, float w2){
+    float dot_product = u1 * u2 + v1 * v2 + w1 * w2;
+    float vector_1_magnitude = sqrt(u1 * u1 + v1 * v1 + w1 * w1);
+    float vector_2_magnitude = sqrt(u2 * u2 + v2 * v2 + w2 * w2);
+    float denom  = vector_1_magnitude * vector_2_magnitude;
+    if (denom == 0)
+        denom = 0.0001;
+   
+    float cos_angle = dot_product / denom;
+    
+    // Must scale cos_angle to 10000 before feeding to function
+    s16 angle =  int_arc_cos(10000 * cos_angle);
+    return angle;
+}
+
 void assign_interpolation_index(int * idx_b, int * idx_c, int idx_n, const int NUM_REFERENCE, float ref_dist[], float test_ref_dist[]){
     if(idx_n - 1 < 0){
         *idx_b = idx_n;
@@ -90,11 +106,12 @@ void assign_interpolation_index(int * idx_b, int * idx_c, int idx_n, const int N
     *idx_c = idx_n + 1;
 }
 
+/*
+* Algorithm based on the paper: http://ieeexplore.ieee.org/document/6865777/
+* Calculates the amount of glucose of a color data given other reference data
+* Author: Budi RYAN
+*/
 float interpolate(COLOR_OBJECT test_data){
-    /*
-     * Algorithm based on the paper: http://ieeexplore.ieee.org/document/6865777/
-     * Author: Budi RYAN
-     */
     // Define reference data, test data and other necessary flags + variables
     const int NUM_REFERENCE = 6;
     const int NUM_STAGE = NUM_REFERENCE - 1;
@@ -119,6 +136,7 @@ float interpolate(COLOR_OBJECT test_data){
     sprintf(str, "%.2f\n%.2f\n%.2f\n%.2f\n%.2f",ref_dist[0],ref_dist[1],ref_dist[2],ref_dist[3],ref_dist[4]);
     TM_ILI9341_Puts(240, 40, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     */
+    
     idx_n = smallest_arg(test_ref_dist, NUM_STAGE);
     
     assign_interpolation_index(&idx_b, &idx_c, idx_n, NUM_REFERENCE, ref_dist, test_ref_dist);
@@ -474,6 +492,7 @@ void display_analysis(u16 image[], u16 array_length, COLOR_TYPE color){
     TM_ILI9341_Puts(20, 160, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     sprintf(str, "%.2f", B);
     TM_ILI9341_Puts(20, 180, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+   
     
     
     TM_ILI9341_Puts(100, 140, "glucose score:", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);

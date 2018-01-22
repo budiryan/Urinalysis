@@ -31,6 +31,8 @@ typedef struct {
     int score;
 } COLOR_OBJECT;
 
+
+s16 calculate_angle(float R1, float G1, float B1, float R2, float G2, float  B2);
 float interpolate(COLOR_OBJECT test_data);
 void convertRGBtoXYZ(int inR, int inG, int inB, float * outX, float * outY, float * outZ);
 void convertXYZtoLab(float inX, float inY, float inZ, float * outL, float * outa, float * outb);
