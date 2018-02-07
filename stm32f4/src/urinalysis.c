@@ -1,12 +1,28 @@
 #include "urinalysis.h"
 
+// Extern variables from other files
 extern float interpolation_score;
 extern char str[40];
-//Fatfs object
+
+
+//Fatfs objects for MicroSD card
 FATFS FatFs;
 FIL fil;
 FRESULT fres;
 
+
+/***************************************************
+ *  Returns: Nothing
+ *
+ *  Parameters:  Nothing
+ *
+ *  Description: Inits all devices on the system
+ *  
+ *  List of devices: LED, pump, button, stepper motor,
+ *                   ticks, delay, LCD monitor, Bluetooth,
+ *                   Camera
+ *
+ ***************************************************/
 void init_system(void){
     SystemInit();
     led_init();
@@ -23,6 +39,19 @@ void init_system(void){
     DCMI_CaptureCmd(ENABLE);
 }
 
+
+/***************************************************
+ *  Returns: FRESULT Object 
+ *
+ *  Parameters:  Address of variable fil (&fil), File name
+ *
+ *  Description: Opens a file stream so texts can be appended to the file
+ *  
+ *  List of devices: LED, pump, button, stepper motor,
+ *                   ticks, delay, LCD monitor, Bluetooth,
+ *                   Camera
+ *
+ ***************************************************/
 FRESULT open_append (FIL* fp, const char* path)
 {
     FRESULT fr;
@@ -38,7 +67,7 @@ FRESULT open_append (FIL* fp, const char* path)
     return fr;
 }
 
-/* Converts an integer to char array */
+/* Converts an integer to char array, similar to sprintf() */
 char * itoa (int value, char *result, int base)
 {
     // check that the base if valid
@@ -64,6 +93,7 @@ char * itoa (int value, char *result, int base)
     return result;
 }
 
+// Display camera picture image on screen and prints all the analysis
 void analyze_dipstick_paper(){
     delay_ms(500);
     TM_ILI9341_DisplayImage((u16 *) frame_buffer);
@@ -73,8 +103,7 @@ void analyze_dipstick_paper(){
     TM_ILI9341_Puts(180, 20, "         ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
 }
 
-
-
+// Transfers interpolation score to SD card
 void sd_transfer_data(float interpolation_score){
     TM_ILI9341_Puts(180, 200, "                ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     fres = f_mount(&FatFs, "", 1);
@@ -97,15 +126,7 @@ void sd_transfer_data(float interpolation_score){
     fres = f_mount(0, "", 1);
 }
 
-void sd_test_init(void){
-    fres = f_mount(&FatFs, "", 1);
-    // TM_ILI9341_Puts(180, 200, "SD:", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    // TM_ILI9341_Puts(210, 200, itoa(fres, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-
-    fres = f_mount(0, "", 1);
-    // TM_ILI9341_Puts(255, 200, itoa(fres, str, 10), &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-}
-
+// Sends interpolation result via Bluetooth
 void send_bluetooth(){
     TM_ILI9341_Puts(180, 200, "BT trans OK", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     if (interpolation_score > 20)
@@ -114,6 +135,7 @@ void send_bluetooth(){
         uart_tx(COM3, "Glucose level is normal at: %.3f mg/dL \n", interpolation_score);
 }
 
+// Utility function to clear certain area of the LCD screen
 void clear_counter(){
     TM_ILI9341_Puts(180, 20, "           ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     TM_ILI9341_Puts(180, 40, "    ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);

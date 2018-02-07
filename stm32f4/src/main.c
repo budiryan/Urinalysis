@@ -23,8 +23,6 @@ int main() {
     init_system();
     TM_ILI9341_Puts(0, 0, "Live Feed:", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     TM_ILI9341_Puts(180, 0, "STATUS: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    sd_test_init();
-    int angle = calculate_angle(2,2,2,-2,-1,-1);
     
     while(true){
         if (capture_cam == true) {

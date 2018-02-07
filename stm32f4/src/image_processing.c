@@ -1,24 +1,7 @@
 #include "image_processing.h"
-/*
-This reference colors are from the original paper
-#define REF1_VAL {146, 203, 170, 0.0}
-#define REF2_VAL {144, 197, 106, 100.0}
-#define REF3_VAL {118, 163, 47, 200.0}
-#define REF4_VAL {132, 118, 19, 500.0}
-#define REF5_VAL {124, 82, 0, 1000.0}
-#define REF6_VAL {90, 40, 13, 2000.0}
-*/
 
-// Reference color from real environment --> mg / dL --> in JCH
-/*
-#define REF1_VAL {175, 167, 127, 0}
-#define REF2_VAL {135, 159, 119, 15}
-#define REF3_VAL {95, 151, 119, 50}
-#define REF4_VAL {79, 135, 119, 150}
-#define REF5_VAL {71, 103, 87, 500}
-#define REF6_VAL {44, 71, 63, 1000}
-*/
 // Reference color from real environment --> mg / dL --> in Room 3115
+// Format {R888, G888, B888, Glucose concentration in mg / dL}
 #define REF1_VAL {175, 167, 135, 0}
 #define REF2_VAL {135, 159, 127, 15}
 #define REF3_VAL {95, 135, 103, 50}
@@ -27,15 +10,18 @@ This reference colors are from the original paper
 #define REF6_VAL {47, 55, 55, 1000}
 
 
-
-// Constants used for rgb transformation
-extern char str[100];
+// Constants used by LAB formula for rgb transformation
+extern char str[40];
 float ref_x = 95.047;
 float ref_y = 100.0;
 float ref_z = 108.883;
 float interpolation_score;
+
+// Variable used to store segmented area from camera array
 volatile u16 segmentation[SEGMENT_ROWS * SEGMENT_COLUMNS];
-volatile uint16_t frame_buffer[CAMERA_ROWS * CAMERA_COLUMNS];
+
+// The whole camera array
+volatile u16 frame_buffer[CAMERA_ROWS * CAMERA_COLUMNS];
 
 COLOR_OBJECT ref1 = REF1_VAL;
 COLOR_OBJECT ref2 = REF2_VAL;
@@ -45,6 +31,16 @@ COLOR_OBJECT ref5 = REF5_VAL;
 COLOR_OBJECT ref6 = REF6_VAL;
 
 
+/***************************************************
+ *  Returns:     Interpolation value from reference
+ *               urine color data
+ *
+ *  Parameters:  A COLOR_OBJECT object
+ *
+ *  Description: Algorithm based on the paper: http://ieeexplore.ieee.org/document/6865777/
+ *               Calculates the amount of glucose of a color data given other reference data
+ *
+ ***************************************************/
 s16 calculate_angle(float u1, float v1, float w1, float u2, float v2, float w2){
     float dot_product = u1 * u2 + v1 * v2 + w1 * w2;
     float vector_1_magnitude = sqrt(u1 * u1 + v1 * v1 + w1 * w1);
@@ -60,6 +56,16 @@ s16 calculate_angle(float u1, float v1, float w1, float u2, float v2, float w2){
     return angle;
 }
 
+/***************************************************
+ *  Returns:     Nothing
+ *
+ *  Parameters:  Index B, Index C, Index N (Smallest distance from test data to one of the reference data),
+ *               , Number of reference data, test_ref_dist(Distance from test data to each of the reference point)
+ *
+ *  Description: A utility function used by function 'interpolate', it assigns Index B and C to 2 of the given reference points,
+ *               See the paper for more details
+ *
+ ***************************************************/
 void assign_interpolation_index(int * idx_b, int * idx_c, int idx_n, const int NUM_REFERENCE, float ref_dist[], float test_ref_dist[]){
     if(idx_n - 1 < 0){
         *idx_b = idx_n;
@@ -107,10 +113,19 @@ void assign_interpolation_index(int * idx_b, int * idx_c, int idx_n, const int N
 }
 
 /*
-* Algorithm based on the paper: http://ieeexplore.ieee.org/document/6865777/
-* Calculates the amount of glucose of a color data given other reference data
-* Author: Budi RYAN
+
 */
+
+/***************************************************
+ *  Returns:     Interpolation value from reference
+ *               urine color data
+ *
+ *  Parameters:  A COLOR_OBJECT object
+ *
+ *  Description: Algorithm based on the paper: http://ieeexplore.ieee.org/document/6865777/
+ *               Calculates the amount of glucose of a color data given other reference data
+ *
+ ***************************************************/
 float interpolate(COLOR_OBJECT test_data){
     // Define reference data, test data and other necessary flags + variables
     const int NUM_REFERENCE = 6;
@@ -130,6 +145,7 @@ float interpolate(COLOR_OBJECT test_data){
     for(int i=0; i < NUM_REFERENCE; i++){
         test_ref_dist[i] = RGB_color_Lab_difference_CIE76(test_data, ref_data[i]);
     }
+    
     /* USEFUL FOR DEBUGGING
     sprintf(str, "%.2f\n%.2f\n%.2f\n%.2f\n%.2f\n%.2f",test_ref_dist[0],test_ref_dist[1],test_ref_dist[2],test_ref_dist[3],test_ref_dist[4],test_ref_dist[5]);
     TM_ILI9341_Puts(180, 40, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
@@ -430,7 +446,15 @@ float RGB_color_Lab_difference_CIE94( int R1, int G1, int B1, int R2, int G2, in
 	return( Lab_color_difference_CIE94(l1 ,a1 ,b1 ,l2 ,a2 ,b2) );
 }
 
-// Displays the average of each color channel, given an image array
+/***************************************************
+ *  Returns:     Information on LCD, nothing returned by this function
+ *
+ *  Parameters:  Image array, length of the array, RGB 565 OR RGB 555 color format
+ *
+ *  Description: Displays the average R, G ,B element of an image array,
+ *               Also displays interpolation value of the segmented color array
+ *
+ ***************************************************/
 void display_analysis(u16 image[], u16 array_length, COLOR_TYPE color){
     uint64_t r = 0;
     uint64_t g = 0;
@@ -469,28 +493,23 @@ void display_analysis(u16 image[], u16 array_length, COLOR_TYPE color){
         break;
     }
     
-    // convert to cie lab
-    float X, Y, Z;
-    float L, A, B;
     // convert r, g, b to 255 scale
     r = r / 32.0f * 255.0f;
     g = g / 32.0f * 255.0f;
     b = b / 32.0f * 255.0f;
-    convertRGBtoXYZ(r, g, b, &X, &Y, &Z);
-    convertXYZtoLab(X, Y, Z, &L, &A, &B);
     COLOR_OBJECT test = {r, g, b, 0};
     TM_ILI9341_Puts(0, 140, "               ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     TM_ILI9341_Puts(0, 160, "               ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     TM_ILI9341_Puts(0, 180, "               ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    TM_ILI9341_Puts(0, 140, "L: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    TM_ILI9341_Puts(0, 160, "A: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    TM_ILI9341_Puts(0, 140, "R: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    TM_ILI9341_Puts(0, 160, "G: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     TM_ILI9341_Puts(0, 180, "B: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     
-    sprintf(str, "%.2f", L);
+    sprintf(str, "%d", r);
     TM_ILI9341_Puts(20, 140, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    sprintf(str, "%.2f", A);
+    sprintf(str, "%d", g);
     TM_ILI9341_Puts(20, 160, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    sprintf(str, "%.2f", B);
+    sprintf(str, "%d", b);
     TM_ILI9341_Puts(20, 180, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
    
     
