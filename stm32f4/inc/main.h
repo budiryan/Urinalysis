@@ -57,8 +57,8 @@
 #include "urinalysis.h"
 #include <stdio.h>
 
-extern volatile uint16_t frame_buffer[CAMERA_ROWS * CAMERA_COLUMNS];
-extern volatile int segmentation[SEGMENT_ROWS * SEGMENT_COLUMNS];
+extern volatile u16 frame_buffer[CAMERA_ROWS * CAMERA_COLUMNS];
+extern volatile u16 segmentation[SEGMENT_ROWS * SEGMENT_COLUMNS];
 
 void init(void);
 

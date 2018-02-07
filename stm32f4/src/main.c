@@ -23,24 +23,21 @@ int main() {
     init_system();
     TM_ILI9341_Puts(0, 0, "Live Feed:", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     TM_ILI9341_Puts(180, 0, "STATUS: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    uart_tx(COM3, "GROUP 22: Home-Based Urinalysis System\n");
-    sd_test_init();
-    
     
     while(true){
         if (capture_cam == true) {
              capture_cam = false;
              TM_ILI9341_DisplayImage((u16 *) frame_buffer);
         }
+        analyze_dipstick_paper();
         if(button_pressed(BUTTON_K1)){
             // Capture one time and display analysis
-            while(button_pressed(BUTTON_K1));
-            analyze_dipstick_paper();
-            sd_transfer_data(interpolation_score);
+            // while(button_pressed(BUTTON_K1));
+            // sd_transfer_data(interpolation_score);
         }
         if(button_pressed(BUTTON_K0)){
-            process = PUMP_URINE;
-            pump_time_stamp = get_seconds();
+            // process = PUMP_URINE;
+            // pump_time_stamp = get_seconds();
         }
         
         switch(process){
