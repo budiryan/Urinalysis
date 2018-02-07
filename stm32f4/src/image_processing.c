@@ -32,13 +32,10 @@ COLOR_OBJECT ref6 = REF6_VAL;
 
 
 /***************************************************
- *  Returns:     Interpolation value from reference
- *               urine color data
+ *  Returns:     Cosine angle distance
  *
- *  Parameters:  A COLOR_OBJECT object
+ *  Parameters:  2 vectors with 3 dimensions
  *
- *  Description: Algorithm based on the paper: http://ieeexplore.ieee.org/document/6865777/
- *               Calculates the amount of glucose of a color data given other reference data
  *
  ***************************************************/
 s16 calculate_angle(float u1, float v1, float w1, float u2, float v2, float w2){
