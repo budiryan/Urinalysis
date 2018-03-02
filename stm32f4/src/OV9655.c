@@ -118,8 +118,6 @@ uint8_t OV9655_Configuration(void){
     // DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS,0x41, 0x43);
     // Contrast settings
     // DCMI_SingleRandomWrite(OV9655_DEVICE_WRITE_ADDRESS,0x56, 0x3A);
-    sprintf(str_2, "ID: %d", OV9655_ID.Manufacturer_ID1);
-    TM_ILI9341_Puts(180, 180, str_2, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
 
     return (0x00);
 }

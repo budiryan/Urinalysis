@@ -1,13 +1,6 @@
 #include "main.h"
 
 
-/*
-ACKNOWLEDGEMENT:
-I fully acknowledge third party sources I have used while developing the project:
-- Tilen Majerle for controlling the LCD Monitor
-- ChaN for the Micro SD card library
-*/
-
 static bool capture_cam = false;
 extern float interpolation_score;
 char str[40];
@@ -29,15 +22,13 @@ int main() {
              capture_cam = false;
              TM_ILI9341_DisplayImage((u16 *) frame_buffer);
         }
-        analyze_dipstick_paper();
-        if(button_pressed(BUTTON_K1)){
-            // Capture one time and display analysis
-            // while(button_pressed(BUTTON_K1));
-            // sd_transfer_data(interpolation_score);
-        }
-        if(button_pressed(BUTTON_K0)){
-            // process = PUMP_URINE;
-            // pump_time_stamp = get_seconds();
+        //analyze_dipstick_paper();
+        
+        if(get_seconds() % 1 == 0){
+            sprintf(str, "%d", get_seconds());
+            uart_tx(COM3, "hehehehelolol\r\n");
+            TM_ILI9341_Puts(180, 80, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+            TM_ILI9341_Puts(180, 60, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
         }
         
         switch(process){

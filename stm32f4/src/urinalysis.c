@@ -33,7 +33,7 @@ void init_system(void){
     delay_init();
     TM_ILI9341_Init();
     TM_ILI9341_Fill(ILI9341_COLOR_WHITE);
-    TM_ILI9341_Rotate(TM_ILI9341_Orientation_Landscape_2);
+    TM_ILI9341_Rotate(TM_ILI9341_Orientation_Landscape_1);
     uart_init(COM3, 9600);
     OV9655_Configuration();
     DCMI_CaptureCmd(ENABLE);
