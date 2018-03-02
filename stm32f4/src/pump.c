@@ -9,10 +9,10 @@ void pump(u16 speed, PUMP_DIRECTION direction){
     // Set dir pin
     
     switch(direction){
-        case CW:
+        case PUMP_CW:
             GPIO_ResetBits(DIR_GPIO, DIR_GPIO_PIN);
             break;
-        case CCW:
+        case PUMP_CCW:
             GPIO_SetBits(DIR_GPIO, DIR_GPIO_PIN);
             break;
     }

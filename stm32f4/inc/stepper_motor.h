@@ -23,12 +23,12 @@
 #define STEPPER_STEP_GPIO_RCC	       RCC_AHB1Periph_GPIOA
 
 typedef enum {
-  STEPPER_CW, STEPPER_CCW
+  STEPPER_CCW, STEPPER_CW
 } STEPPER_DIRECTION;
 
 
 void stepper_init(void);
-void stepper_spin(STEPPER_DIRECTION direction, uint32_t speed);
+void stepper_spin(uint32_t speed , STEPPER_DIRECTION direction);
 void _stepper_step_init(void);
 void _stepper_dir_init(void);
 

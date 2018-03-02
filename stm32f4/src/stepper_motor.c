@@ -5,14 +5,14 @@ void stepper_init(void){
     _stepper_dir_init();
 }
 
-void stepper_spin(STEPPER_DIRECTION direction, uint32_t speed){
+void stepper_spin(uint32_t speed , STEPPER_DIRECTION direction){
     // Set dir pin
     switch(direction){
         case STEPPER_CW:
-            GPIO_SetBits(STEPPER_DIR_GPIO, STEPPER_DIR_GPIO_PIN);
+            GPIO_ResetBits(STEPPER_DIR_GPIO, STEPPER_DIR_GPIO_PIN);
             break;
         case STEPPER_CCW:
-            GPIO_ResetBits(STEPPER_DIR_GPIO, STEPPER_DIR_GPIO_PIN);
+            GPIO_SetBits(STEPPER_DIR_GPIO, STEPPER_DIR_GPIO_PIN);
             break;
     }
     // Set step pwm

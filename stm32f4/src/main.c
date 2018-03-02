@@ -16,7 +16,8 @@ int main() {
     init_system();
     TM_ILI9341_Puts(0, 0, "Live Feed:", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     TM_ILI9341_Puts(180, 0, "STATUS: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    
+    pump(300, PUMP_CW);
+    stepper_spin(300, STEPPER_CW);
     while(true){
         if (capture_cam == true) {
              capture_cam = false;
@@ -38,11 +39,11 @@ int main() {
                 sprintf(str, "%d", get_seconds() - pump_time_stamp);
                 TM_ILI9341_Puts(180, 40, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
                 if(get_seconds() - pump_time_stamp < PUMP_DURATION)
-                    pump(400, CCW);
+                    pump(400, PUMP_CCW);
                 else{
                     // process = ROTATE_MOTOR;
                     process = ROTATE_MOTOR;
-                    pump(0, CW);
+                    pump(0, PUMP_CW);
                 }
             break;
             case ROTATE_MOTOR:
@@ -53,16 +54,16 @@ int main() {
                 for(int i = 0; i < ROTATION_COUNT; i++){
                     sprintf(str, "%d", i + 1);
                     TM_ILI9341_Puts(180, 40, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-                    pump(0, CCW);
+                    pump(0, PUMP_CCW);
                     stepper_spin(STEPPER_CW, 300);
                     delay_us(3 * MOTOR_DURATION_US);
                     // After some second, stop
                     stepper_spin(STEPPER_CW, 0);
-                    pump(400, CCW);
+                    pump(400, PUMP_CCW);
                     delay_ms(MINI_PUMP_DURATION);
                 }
                 // wait 4 sec to let the urine flows
-                pump(0, CCW);
+                pump(0, PUMP_CCW);
                 TM_ILI9341_Puts(180, 20, "WAIT   ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
                 delay_ms(WAIT_DURATION);
                 process = PERFORM_ANALYSIS;
@@ -94,10 +95,10 @@ int main() {
                 sprintf(str, "%d", get_seconds() - pump_time_stamp);
                 TM_ILI9341_Puts(180, 40, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
                 if(get_seconds() - pump_time_stamp < PUMP_DURATION)
-                    pump(400, CW);
+                    pump(400, PUMP_CW);
                 else{
                     process = IDLE;
-                    pump(0, CW);
+                    pump(0, PUMP_CW);
                 }
             break;
             case IDLE:

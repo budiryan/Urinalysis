@@ -23,7 +23,7 @@
 #define PUMP_STEP_GPIO_RCC	       RCC_AHB1Periph_GPIOA
 
 typedef enum {
-  CW, CCW
+  PUMP_CW, PUMP_CCW
 } PUMP_DIRECTION;
 
 void pump_init(void);
