@@ -26,8 +26,12 @@ typedef enum {
   PUMP_CW, PUMP_CCW
 } PUMP_DIRECTION;
 
+typedef enum{
+  PUMP_PUMP, PUMP_STOP
+} PUMP_STATUS;
+
 void pump_init(void);
-void pump(u16 speed, PUMP_DIRECTION direction);
+void pump(u16 speed, PUMP_DIRECTION direction, u8 start_pump);
 void _pump_step_init(void);
 void _pump_dir_init(void);
 

@@ -1,11 +1,13 @@
 #include "stepper_motor.h"
+TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
+TIM_OCInitTypeDef  TIM_OCInitStructure;
 
 void stepper_init(void){
     _stepper_step_init();
     _stepper_dir_init();
 }
 
-void stepper_spin(uint32_t speed , STEPPER_DIRECTION direction){
+void stepper_spin(uint32_t speed , STEPPER_DIRECTION direction, u8 spinning){
     // Set dir pin
     switch(direction){
         case STEPPER_CW:
@@ -15,15 +17,27 @@ void stepper_spin(uint32_t speed , STEPPER_DIRECTION direction){
             GPIO_SetBits(STEPPER_DIR_GPIO, STEPPER_DIR_GPIO_PIN);
             break;
     }
-    // Set step pwm
-    TIM_SetCompare3(STEPPER_STEP_TIM, speed);
+    
+    // Set spin / stop
+    switch(spinning){
+        case 1:
+            TIM_SetCompare3(STEPPER_STEP_TIM, 1);
+            break;
+        case 0:
+            TIM_SetCompare3(STEPPER_STEP_TIM, 0);
+            break;
+    }
+    
+    // Adjust the speed of the stepper motor
+    TIM_TimeBaseStructure.TIM_Period = speed;
+    TIM_TimeBaseInit(STEPPER_STEP_TIM, &TIM_TimeBaseStructure);
 }
+
 
 // Default PWM frequency for Step pin is: 2500 hz
 void _stepper_step_init(void){
     GPIO_InitTypeDef STEP_GPIO_InitStructure;
-	TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
-	TIM_OCInitTypeDef  TIM_OCInitStructure;
+
 
 	RCC_APB2PeriphClockCmd(STEPPER_STEP_TIM_RCC, ENABLE);
     // Enable bus
@@ -46,9 +60,9 @@ void _stepper_step_init(void){
 	TIM_TimeBaseStructure.TIM_RepetitionCounter = 0;
 
     //clk=168M/(167+1)=1 MHz, Freq = 1000000 / 400 = 2500Hz
-	TIM_TimeBaseStructure.TIM_Prescaler = 39;
+	TIM_TimeBaseStructure.TIM_Prescaler = 399;
     //pulse cycle= 400 
-	TIM_TimeBaseStructure.TIM_Period = 1000;
+	TIM_TimeBaseStructure.TIM_Period = 100;
 
 	TIM_TimeBaseInit(STEPPER_STEP_TIM, &TIM_TimeBaseStructure);
 	

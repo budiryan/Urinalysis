@@ -95,11 +95,8 @@ char * itoa (int value, char *result, int base)
 
 // Display camera picture image on screen and prints all the analysis
 void analyze_dipstick_paper(){
-    delay_ms(500);
-    TM_ILI9341_DisplayImage((u16 *) frame_buffer);
     TM_ILI9341_Puts(180, 20, "Analyzing", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     display_analysis((u16 *)segmentation, 25, RGB565);
-    delay_ms(500);
     TM_ILI9341_Puts(180, 20, "         ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
 }
 

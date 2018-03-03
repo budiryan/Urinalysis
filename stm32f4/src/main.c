@@ -6,12 +6,17 @@ extern float interpolation_score;
 char str[40];
 uint32_t pump_time_stamp;
 URINALYSIS_PROCESS process = IDLE;
+
+// Constant Definition
 #define PUMP_DURATION 105
 #define MOTOR_DURATION_US 762500
 #define MINI_PUMP_DURATION 2100
 #define ROTATION_COUNT 1
 #define WAIT_DURATION 6000
 
+PUMP_STATUS pump_status = PUMP_STOP;
+PUMP_STATUS pump_reverse_status = PUMP_STOP;
+STEPPER_STATUS stepper_status = STEPPER_STOP;
 
 
 /*
@@ -19,31 +24,67 @@ URINALYSIS_PROCESS process = IDLE;
 * Bluetooth Listener to receive data from Android Phone / USART
 */
 void receiver(const uint8_t byte) {
-    // Comparing received data example
-    /*
-    if(byte == 'j'){
-        uart_tx(COM3, "jackpot! \r\n");
+    // Sending back the received data example for confirmation
+    uart_tx(COM3, &byte);
+    uart_tx(COM3, "\r\n");
+    switch(byte){
+        case 'm':
+            switch(stepper_status){
+                case STEPPER_STOP:
+                    stepper_spin(100, STEPPER_CW, 1);
+                    stepper_status = STEPPER_SPIN;
+                break;
+                case STEPPER_SPIN:
+                    // stepper_spin(0, STEPPER_CW);
+                    stepper_spin(1000, STEPPER_CW, 1);
+                    stepper_status = STEPPER_STOP;
+                break;
+            }
+            break;
+        case 'p':
+            switch(pump_status){
+                case PUMP_STOP:
+                    pump(50, PUMP_CCW, 1);
+                    pump_status = PUMP_PUMP;
+                break;
+                case PUMP_PUMP:
+                    pump(50, PUMP_CW, 1);
+                    pump_status = PUMP_STOP;
+                break;
+            }
+            break;
+        case 'l':
+            switch(pump_reverse_status){
+                case PUMP_STOP:
+                    pump(400, PUMP_CW, 1);
+                    pump_reverse_status = PUMP_PUMP;
+                break;
+                case PUMP_PUMP:
+                    pump(400, PUMP_CW, 0);
+                    pump_reverse_status = PUMP_STOP;
+                break;
+            }
+            break;
+        case 's':
+            stepper_spin(1000, STEPPER_CW, 0);
+            pump(0, PUMP_CW, 0);
+            break;
+        case 'c':
+            analyze_dipstick_paper();
+            break;
     }
-    */
-    
-    // Sending back the received data example
-    // uart_tx(COM3, &byte);
-    
 
 }
 
 on_receive_listener * listener = &receiver;
 
 
-
 int main() {
     init_system();
-    TM_ILI9341_Puts(0, 0, "Live Feed:", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    TM_ILI9341_Puts(0, 0, "Urinalysis", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     TM_ILI9341_Puts(180, 0, "STATUS: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    pump(300, PUMP_CW);
-    stepper_spin(300, STEPPER_CW);
     
-    uart_tx(COM3, "Hello World!\r\n");
+    uart_tx(COM3, "Welcome to FYP Urinalysis System!\r\n");
     
     // Initialize bluetooth listener
     uart_interrupt_init(COM3, listener);
@@ -53,8 +94,6 @@ int main() {
              TM_ILI9341_DisplayImage((u16 *) frame_buffer);
         }
         
-        
-        
         switch(process){
             case PUMP_URINE:
                 clear_counter();
@@ -62,11 +101,11 @@ int main() {
                 sprintf(str, "%d", get_seconds() - pump_time_stamp);
                 TM_ILI9341_Puts(180, 40, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
                 if(get_seconds() - pump_time_stamp < PUMP_DURATION)
-                    pump(400, PUMP_CCW);
+                    pump(50, PUMP_CCW, 1);
                 else{
                     // process = ROTATE_MOTOR;
                     process = ROTATE_MOTOR;
-                    pump(0, PUMP_CW);
+                    pump(50, PUMP_CW, 0);
                 }
             break;
             case ROTATE_MOTOR:
@@ -77,16 +116,16 @@ int main() {
                 for(int i = 0; i < ROTATION_COUNT; i++){
                     sprintf(str, "%d", i + 1);
                     TM_ILI9341_Puts(180, 40, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-                    pump(0, PUMP_CCW);
-                    stepper_spin(STEPPER_CW, 300);
+                    pump(400, PUMP_CCW, 1);
+                    stepper_spin(100, STEPPER_CW, 1);
                     delay_us(3 * MOTOR_DURATION_US);
                     // After some second, stop
-                    stepper_spin(STEPPER_CW, 0);
-                    pump(400, PUMP_CCW);
+                    stepper_spin(100, STEPPER_CW, 0);
+                    pump(400, PUMP_CCW, 0);
                     delay_ms(MINI_PUMP_DURATION);
                 }
                 // wait 4 sec to let the urine flows
-                pump(0, PUMP_CCW);
+                pump(0, PUMP_CCW, 0);
                 TM_ILI9341_Puts(180, 20, "WAIT   ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
                 delay_ms(WAIT_DURATION);
                 process = PERFORM_ANALYSIS;
@@ -118,10 +157,10 @@ int main() {
                 sprintf(str, "%d", get_seconds() - pump_time_stamp);
                 TM_ILI9341_Puts(180, 40, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
                 if(get_seconds() - pump_time_stamp < PUMP_DURATION)
-                    pump(400, PUMP_CW);
+                    pump(50, PUMP_CW, 1);
                 else{
                     process = IDLE;
-                    pump(0, PUMP_CW);
+                    pump(50, PUMP_CW, 0);
                 }
             break;
             case IDLE:

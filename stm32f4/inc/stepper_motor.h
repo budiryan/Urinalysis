@@ -26,9 +26,12 @@ typedef enum {
   STEPPER_CCW, STEPPER_CW
 } STEPPER_DIRECTION;
 
+typedef enum{
+  STEPPER_SPIN, STEPPER_STOP
+} STEPPER_STATUS;
 
 void stepper_init(void);
-void stepper_spin(uint32_t speed , STEPPER_DIRECTION direction);
+void stepper_spin(uint32_t speed , STEPPER_DIRECTION direction, u8 spinning);
 void _stepper_step_init(void);
 void _stepper_dir_init(void);
 
