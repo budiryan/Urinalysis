@@ -12,25 +12,48 @@ URINALYSIS_PROCESS process = IDLE;
 #define ROTATION_COUNT 1
 #define WAIT_DURATION 6000
 
+
+
+/*
+*
+* Bluetooth Listener to receive data from Android Phone / USART
+*/
+void receiver(const uint8_t byte) {
+    // Comparing received data example
+    /*
+    if(byte == 'j'){
+        uart_tx(COM3, "jackpot! \r\n");
+    }
+    */
+    
+    // Sending back the received data example
+    // uart_tx(COM3, &byte);
+    
+
+}
+
+on_receive_listener * listener = &receiver;
+
+
+
 int main() {
     init_system();
     TM_ILI9341_Puts(0, 0, "Live Feed:", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     TM_ILI9341_Puts(180, 0, "STATUS: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     pump(300, PUMP_CW);
     stepper_spin(300, STEPPER_CW);
+    
+    uart_tx(COM3, "Hello World!\r\n");
+    
+    // Initialize bluetooth listener
+    uart_interrupt_init(COM3, listener);
     while(true){
         if (capture_cam == true) {
              capture_cam = false;
              TM_ILI9341_DisplayImage((u16 *) frame_buffer);
         }
-        //analyze_dipstick_paper();
         
-        if(get_seconds() % 1 == 0){
-            sprintf(str, "%d", get_seconds());
-            uart_tx(COM3, "hehehehelolol\r\n");
-            TM_ILI9341_Puts(180, 80, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-            TM_ILI9341_Puts(180, 60, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-        }
+        
         
         switch(process){
             case PUMP_URINE:

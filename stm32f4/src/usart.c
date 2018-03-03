@@ -27,6 +27,8 @@ uc16 COM_IRQ[COMn] = {USART1_IRQn, USART3_IRQn};
 
 COM_TypeDef printf_COMx;
 
+
+
 /**
   * @brief  Inintialization of USART
   * @param  COM: which USART to inialialize
@@ -192,22 +194,11 @@ void USART3_IRQHandler(void)
 	if(USART_GetITStatus(USART3,USART_IT_RXNE) != RESET)
 	{ // check RX interrupt
 		if (!uart3_listener_empty)
-			(*uart3_rx_listener)(USART_ReceiveData(USART1));
+			(*uart3_rx_listener)(USART_ReceiveData(USART3));
 		USART_ClearITPendingBit(USART3, USART_IT_RXNE);
 	}
 }
 
-/*
-void USART2_IRQHandler(void)
-{
-	if(USART_GetITStatus(USART2,USART_IT_RXNE) != RESET)
-	{ // check RX interrupt
-		if (!uart2_listener_empty)
-			(*uart2_rx_listener)(USART_ReceiveData(USART2));
-		USART_ClearITPendingBit(USART2, USART_IT_RXNE);
-	}
-}
-*/
 
 /**
   * @brief  Binding of function Printf
