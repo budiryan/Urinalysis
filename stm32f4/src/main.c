@@ -17,6 +17,7 @@ URINALYSIS_PROCESS process = IDLE;
 PUMP_STATUS pump_status = PUMP_STOP;
 PUMP_STATUS pump_reverse_status = PUMP_STOP;
 STEPPER_STATUS stepper_status = STEPPER_STOP;
+STEPPER_STATUS stepper_status_2 = STEPPER_STOP;
 
 
 /*
@@ -31,37 +32,30 @@ void receiver(const uint8_t byte) {
         case 'm':
             switch(stepper_status){
                 case STEPPER_STOP:
-                    stepper_spin(100, STEPPER_CW, 1);
-                    stepper_status = STEPPER_SPIN;
-                break;
+                    stepper_spin(1400, STEPPER_CW, 1);
+                    break;
                 case STEPPER_SPIN:
-                    // stepper_spin(0, STEPPER_CW);
-                    stepper_spin(1000, STEPPER_CW, 1);
-                    stepper_status = STEPPER_STOP;
-                break;
+                    stepper_spin(1400, STEPPER_CW, 0);
+                    break;
             }
-            break;
+        case 'n':
+            switch(stepper_status_2){
+                case STEPPER_STOP:
+                    stepper_spin(1400, STEPPER_CCW, 1);
+                    break;
+                case STEPPER_SPIN:
+                    stepper_spin(1400, STEPPER_CCW, 0);
+                    break;
+            }   
         case 'p':
             switch(pump_status){
                 case PUMP_STOP:
-                    pump(50, PUMP_CCW, 1);
+                    pump(50, PUMP_CCW, 1); // Sucking into the system
                     pump_status = PUMP_PUMP;
                 break;
                 case PUMP_PUMP:
-                    pump(50, PUMP_CW, 1);
+                    pump(50, PUMP_CW, 1); // Throwing the water away
                     pump_status = PUMP_STOP;
-                break;
-            }
-            break;
-        case 'l':
-            switch(pump_reverse_status){
-                case PUMP_STOP:
-                    pump(400, PUMP_CW, 1);
-                    pump_reverse_status = PUMP_PUMP;
-                break;
-                case PUMP_PUMP:
-                    pump(400, PUMP_CW, 0);
-                    pump_reverse_status = PUMP_STOP;
                 break;
             }
             break;
@@ -88,6 +82,7 @@ int main() {
     
     // Initialize bluetooth listener
     uart_interrupt_init(COM3, listener);
+    
     while(true){
         if (capture_cam == true) {
              capture_cam = false;

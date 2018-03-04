@@ -1,10 +1,10 @@
 Stepper motor:
-Grey: step pin motor --> PA10
-Purple: Dir pin motor --> PA9
-Red: VCC motor
+Grey: step pin motor PA10
+Purple: Dir pin motor PA9
+Red: VCC motor (3.3V)
 
 Pump:
-White: VCC pump
+White: VCC pump (3.3V)
 Brown: Step pin pump PA3
 Black: Dir pin pump PA2
 
@@ -19,10 +19,12 @@ D8 / D6 = PE5
 D9/ D7 = PE6 
 HSYNC = PA4 
 VSYNC = PB7 
-XCLK = PC9 --> PA8 
+XCLK = PA8 
 PXCLK = PA6 
 SIO_C = PB8 
 SIO_D = PB9
+VCC 3.3V
+GND
 
 LCD:
 CS: PD7
@@ -32,26 +34,22 @@ SCK: PB3
 MOSI: PB5
 MISO: Not Used
 LED: 3.3V
+VCC 3.3V
 
 Button:
 K0: PE4 -- Crash D6's Camera
 K1: PE3
 
 LED:
-LED1: PA6 -- Crash with PXCLK's Camera --> not used
+LED1: PA6 -- Crash with PXCLK's Camera --> NOT USED
 LED2: PA7
 
 USART:
 Bluetooth RX: PB10 USART3 
 Bluetooth TX: PB11 USART3
-
-SD Card:
-SDIO D0 - DAT0 - PC8
-SDIO D1 - DAT1 - PC9 - CLASH WITH XCLK
-SDIO D2 - DAT2 - PC10
-SDIO D3 - DAT3 / CD - PC11 - CLASH WITH DCMI_D4v --> OK NOW, only use D0 as data transfer line
-SDIO CMD - CMD - PD2 
-SDIO SCK - SCK - PC12
-VCC
+VCC (3.3V)
 GND
-NC / VSS2 -  GND
+
+167 159 159
+
+159 159 159 

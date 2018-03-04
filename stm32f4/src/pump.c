@@ -55,7 +55,7 @@ void _pump_step_init(void){
 
 	//------------------------------//
 	TIM_TimeBaseStructure_PUMP.TIM_Prescaler = 167;  //clk=168M/(167+1)=1 MHz, Freq = 1,000,000 / 400 = 2500Hz
-	TIM_TimeBaseStructure_PUMP.TIM_Period = 50;     //pulse cycle= 50
+	TIM_TimeBaseStructure_PUMP.TIM_Period = 400;     //pulse cycle= 50
 	//------------------------------//
 
 	TIM_TimeBaseInit(PUMP_STEP_TIM, &TIM_TimeBaseStructure_PUMP);
