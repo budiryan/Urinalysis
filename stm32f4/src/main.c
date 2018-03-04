@@ -6,6 +6,8 @@ extern float interpolation_score;
 char str[40];
 uint32_t pump_time_stamp;
 URINALYSIS_PROCESS process = IDLE;
+uint32_t motor_time_stamp_1;
+uint32_t motor_time_stamp_2;
 
 // Constant Definition
 #define PUMP_DURATION 105
@@ -13,6 +15,7 @@ URINALYSIS_PROCESS process = IDLE;
 #define MINI_PUMP_DURATION 2100
 #define ROTATION_COUNT 1
 #define WAIT_DURATION 6000
+#define MOTOR_DURATION_SECTION 1000
 
 PUMP_STATUS pump_status = PUMP_STOP;
 PUMP_STATUS pump_reverse_status = PUMP_STOP;
@@ -22,48 +25,70 @@ STEPPER_STATUS stepper_status_2 = STEPPER_STOP;
 
 /*
 *
-* Bluetooth Listener to receive data from Android Phone / USART
+* Bluetooth Listener to receive data / send data from USART
 */
 void receiver(const uint8_t byte) {
     // Sending back the received data example for confirmation
-    uart_tx(COM3, &byte);
-    uart_tx(COM3, "\r\n");
     switch(byte){
-        case 'm':
-            switch(stepper_status){
-                case STEPPER_STOP:
-                    stepper_spin(1400, STEPPER_CW, 1);
-                    break;
-                case STEPPER_SPIN:
-                    stepper_spin(1400, STEPPER_CW, 0);
-                    break;
-            }
         case 'n':
+            uart_tx(COM3, "Motor spinning CCW\r\n");
             switch(stepper_status_2){
                 case STEPPER_STOP:
+                    stepper_status_2 = STEPPER_SPIN;
                     stepper_spin(1400, STEPPER_CCW, 1);
                     break;
                 case STEPPER_SPIN:
+                    stepper_status_2 = STEPPER_STOP;
                     stepper_spin(1400, STEPPER_CCW, 0);
                     break;
-            }   
+            }
+            break;
+        case 'm':
+            uart_tx(COM3, "Motor spinning CW\r\n");
+            switch(stepper_status){
+                case STEPPER_STOP:
+                    stepper_status = STEPPER_SPIN;
+                    stepper_spin(1400, STEPPER_CW, 1);
+                    break;
+                case STEPPER_SPIN:
+                    stepper_status = STEPPER_STOP;
+                    stepper_spin(1400, STEPPER_CW, 0);
+                    break;
+            }
+            break;
+        case 'v':
+            // Move stepper motor one section CCW
+            uart_tx(COM3, "Motor move one section CCW\r\n");
+            motor_time_stamp_1 = get_full_ticks();
+            process = MOVE_ONE_SECTION_CCW;
+            break;
+        case 'b':
+            // Move stepper motor one section CW
+            uart_tx(COM3, "Motor move one section CW\r\n");
+            motor_time_stamp_2 = get_full_ticks();
+            process = MOVE_ONE_SECTION_CW;
+            break;
         case 'p':
             switch(pump_status){
                 case PUMP_STOP:
+                    uart_tx(COM3, "Pump sucking \r\n");
                     pump(50, PUMP_CCW, 1); // Sucking into the system
                     pump_status = PUMP_PUMP;
                 break;
                 case PUMP_PUMP:
+                    uart_tx(COM3, "Pump release \r \n");
                     pump(50, PUMP_CW, 1); // Throwing the water away
                     pump_status = PUMP_STOP;
                 break;
             }
             break;
         case 's':
+            uart_tx(COM3, "Stopping the whole system \r\n");
             stepper_spin(1000, STEPPER_CW, 0);
             pump(0, PUMP_CW, 0);
             break;
         case 'c':
+            uart_tx(COM3, "Analyzing segmented area \r\n");
             analyze_dipstick_paper();
             break;
     }
@@ -75,11 +100,10 @@ on_receive_listener * listener = &receiver;
 
 int main() {
     init_system();
-    TM_ILI9341_Puts(0, 0, "Urinalysis", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    TM_ILI9341_Puts(180, 0, "STATUS: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    
+
     
     uart_tx(COM3, "Welcome to FYP Urinalysis System!\r\n");
-    
     // Initialize bluetooth listener
     uart_interrupt_init(COM3, listener);
     
@@ -156,6 +180,26 @@ int main() {
                 else{
                     process = IDLE;
                     pump(50, PUMP_CW, 0);
+                }
+            break;
+            case MOVE_ONE_SECTION_CCW:
+                if((get_full_ticks() - motor_time_stamp_1) < MOTOR_DURATION_SECTION){
+                    stepper_spin(1400, STEPPER_CCW, 1);
+                }
+                else{
+                    stepper_spin(1400, STEPPER_CCW, 0);
+                    process = IDLE;
+                    motor_time_stamp_1 = get_full_ticks();
+                }
+            break;
+            case MOVE_ONE_SECTION_CW:
+                if((get_full_ticks() - motor_time_stamp_2) < MOTOR_DURATION_SECTION){
+                    stepper_spin(1400, STEPPER_CW, 1);
+                }
+                else{
+                    stepper_spin(1400, STEPPER_CW, 0);
+                    process = IDLE;
+                    motor_time_stamp_2 = get_full_ticks();
                 }
             break;
             case IDLE:

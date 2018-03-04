@@ -25,16 +25,16 @@ FRESULT fres;
  ***************************************************/
 void init_system(void){
     SystemInit();
-    led_init();
     pump_init();
-    button_init();
     stepper_init();
-	ticks_init();
+    uart_init(COM3, 9600);
+    ticks_init();
     delay_init();
     TM_ILI9341_Init();
     TM_ILI9341_Fill(ILI9341_COLOR_WHITE);
     TM_ILI9341_Rotate(TM_ILI9341_Orientation_Landscape_1);
-    uart_init(COM3, 9600);
+    TM_ILI9341_Puts(0, 0, "Urinalysis", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    TM_ILI9341_Puts(180, 0, "STATUS: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     OV9655_Configuration();
     DCMI_CaptureCmd(ENABLE);
 }
