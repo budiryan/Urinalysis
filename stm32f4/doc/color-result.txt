@@ -1,0 +1,7 @@
+// White Material
+No liquid 167 159 159
+With liquid 151 159 143
+
+// Transparent Material
+No liquid 167 167 159
+With liquid 167 167 159

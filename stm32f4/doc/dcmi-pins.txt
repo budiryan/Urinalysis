@@ -1,0 +1,12 @@
+DCMI Pin Alternatives:
+D0 --> PA9 / PC6 / PH9
+D1 --> PA10 / PH10 / PC7
+D2 --> PC8 / PE0 / PH11
+D3 --> PC9 / PE1 / PH12
+D4 --> PC11 / PE4 / PH14
+D5 --> PB6 / PI4
+D6 --> PB8 / PE5 / PI6
+D7 --> PB9 / PE6 / PI7
+
+
+

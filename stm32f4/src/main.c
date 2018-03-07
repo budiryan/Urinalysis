@@ -4,10 +4,9 @@
 static bool capture_cam = false;
 extern float interpolation_score;
 char str[40];
-uint32_t pump_time_stamp;
+int pump_time_stamp;
 URINALYSIS_PROCESS process = IDLE;
-uint32_t motor_time_stamp_1;
-uint32_t motor_time_stamp_2;
+int motor_time_stamp;
 
 // Constant Definition
 #define PUMP_DURATION 105
@@ -15,7 +14,7 @@ uint32_t motor_time_stamp_2;
 #define MINI_PUMP_DURATION 2100
 #define ROTATION_COUNT 1
 #define WAIT_DURATION 6000
-#define MOTOR_DURATION_SECTION 1000
+const int MOTOR_DURATION_SECTION = 550;
 
 PUMP_STATUS pump_status = PUMP_STOP;
 PUMP_STATUS pump_reverse_status = PUMP_STOP;
@@ -59,24 +58,26 @@ void receiver(const uint8_t byte) {
         case 'v':
             // Move stepper motor one section CCW
             uart_tx(COM3, "Motor move one section CCW\r\n");
-            motor_time_stamp_1 = get_full_ticks();
+            motor_time_stamp = get_full_ticks();
+            stepper_spin(1400, STEPPER_CCW, 1);
             process = MOVE_ONE_SECTION_CCW;
             break;
         case 'b':
             // Move stepper motor one section CW
             uart_tx(COM3, "Motor move one section CW\r\n");
-            motor_time_stamp_2 = get_full_ticks();
+            motor_time_stamp = get_full_ticks();
+            stepper_spin(1400, STEPPER_CW, 1);
             process = MOVE_ONE_SECTION_CW;
             break;
         case 'p':
             switch(pump_status){
                 case PUMP_STOP:
-                    uart_tx(COM3, "Pump sucking \r\n");
+                    uart_tx(COM3, " Pump sucking \r\n");
                     pump(50, PUMP_CCW, 1); // Sucking into the system
                     pump_status = PUMP_PUMP;
                 break;
                 case PUMP_PUMP:
-                    uart_tx(COM3, "Pump release \r \n");
+                    uart_tx(COM3, " Pump release \r \n");
                     pump(50, PUMP_CW, 1); // Throwing the water away
                     pump_status = PUMP_STOP;
                 break;
@@ -100,9 +101,7 @@ on_receive_listener * listener = &receiver;
 
 int main() {
     init_system();
-    
 
-    
     uart_tx(COM3, "Welcome to FYP Urinalysis System!\r\n");
     // Initialize bluetooth listener
     uart_interrupt_init(COM3, listener);
@@ -114,6 +113,18 @@ int main() {
         }
         
         switch(process){
+            case MOVE_ONE_SECTION_CCW:
+                if((get_full_ticks() - motor_time_stamp) > MOTOR_DURATION_SECTION){
+                    stepper_spin(1400, STEPPER_CCW, 0);
+                    process = IDLE;
+                }
+                break;
+            case MOVE_ONE_SECTION_CW:
+                if((get_full_ticks() - motor_time_stamp) > MOTOR_DURATION_SECTION){
+                    stepper_spin(1400, STEPPER_CW, 0);
+                    process = IDLE;
+                }
+                break;
             case PUMP_URINE:
                 clear_counter();
                 TM_ILI9341_Puts(180, 20, "PUMP URINE", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
@@ -126,7 +137,7 @@ int main() {
                     process = ROTATE_MOTOR;
                     pump(50, PUMP_CW, 0);
                 }
-            break;
+                break;
             case ROTATE_MOTOR:
                 clear_counter();
                 TM_ILI9341_Puts(180, 20, "            ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
@@ -148,7 +159,7 @@ int main() {
                 TM_ILI9341_Puts(180, 20, "WAIT   ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
                 delay_ms(WAIT_DURATION);
                 process = PERFORM_ANALYSIS;
-            break;
+                break;
             case PERFORM_ANALYSIS:
                 clear_counter();
                 TM_ILI9341_Puts(100, 160, "             ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
@@ -156,20 +167,20 @@ int main() {
                 analyze_dipstick_paper();
                 process = ALERT_BLUETOOTH;
                 
-            break;
+                break;
             case ALERT_BLUETOOTH:
                 clear_counter();
                 TM_ILI9341_Puts(180, 20, "BLUETOOTH", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
                 send_bluetooth();
                 process = SAVE_TO_SD_CARD;
-            break;
+                break;
             case SAVE_TO_SD_CARD:
                 TM_ILI9341_Puts(180, 20, "SAVE SD", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
                 sd_transfer_data(interpolation_score);
                 process = CLEAN_PUMP;
                 clear_counter();
                 pump_time_stamp = get_seconds();
-            break;
+                break;
             case CLEAN_PUMP:
                 clear_counter();
                 TM_ILI9341_Puts(180, 20, "CLEAN PUMP", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
@@ -181,32 +192,12 @@ int main() {
                     process = IDLE;
                     pump(50, PUMP_CW, 0);
                 }
-            break;
-            case MOVE_ONE_SECTION_CCW:
-                if((get_full_ticks() - motor_time_stamp_1) < MOTOR_DURATION_SECTION){
-                    stepper_spin(1400, STEPPER_CCW, 1);
-                }
-                else{
-                    stepper_spin(1400, STEPPER_CCW, 0);
-                    process = IDLE;
-                    motor_time_stamp_1 = get_full_ticks();
-                }
-            break;
-            case MOVE_ONE_SECTION_CW:
-                if((get_full_ticks() - motor_time_stamp_2) < MOTOR_DURATION_SECTION){
-                    stepper_spin(1400, STEPPER_CW, 1);
-                }
-                else{
-                    stepper_spin(1400, STEPPER_CW, 0);
-                    process = IDLE;
-                    motor_time_stamp_2 = get_full_ticks();
-                }
-            break;
+                break;
             case IDLE:
                 // do nothing, rofl
                 clear_counter();
                 TM_ILI9341_Puts(180, 20, "IDLE", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-            break;
+                break;
         }
  
     }
