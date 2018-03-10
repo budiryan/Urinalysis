@@ -111,6 +111,8 @@ int main() {
              capture_cam = false;
              TM_ILI9341_DisplayImage((u16 *) frame_buffer);
         }
+        sprintf(str, "%d %d %d", button_pressed(BUTTON_0), button_pressed(BUTTON_1), button_pressed(BUTTON_2));
+        TM_ILI9341_Puts(180, 80, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
         
         switch(process){
             case MOVE_ONE_SECTION_CCW:

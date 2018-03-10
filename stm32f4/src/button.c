@@ -7,7 +7,7 @@ void button_init(){
 	GPIO_InitStructure.GPIO_Speed = GPIO_Medium_Speed;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
-	GPIO_InitStructure.GPIO_Pin = BUTTON_K0_GPIO_PIN | BUTTON_K1_GPIO_PIN;
+	GPIO_InitStructure.GPIO_Pin = BUTTON_0_GPIO_PIN | BUTTON_1_GPIO_PIN | BUTTON_2_GPIO_PIN;
 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
 	GPIO_Init(BUTTON_GPIO, &GPIO_InitStructure);  
 }

@@ -6,15 +6,17 @@
 #include <stdbool.h>
 #include "main.h"
 
-#define BUTTON_GPIO     GPIOE
-#define BUTTON_K0_GPIO_PIN GPIO_Pin_4
-#define BUTTON_K1_GPIO_PIN GPIO_Pin_3
-#define BUTTON_RCC RCC_AHB1Periph_GPIOE
+#define BUTTON_GPIO GPIOD
+#define BUTTON_0_GPIO_PIN GPIO_Pin_0
+#define BUTTON_1_GPIO_PIN GPIO_Pin_1
+#define BUTTON_2_GPIO_PIN GPIO_Pin_2
+#define BUTTON_RCC RCC_AHB1Periph_GPIOD
 
 
 typedef enum{
-    BUTTON_K0 = BUTTON_K0_GPIO_PIN,
-    BUTTON_K1 = BUTTON_K1_GPIO_PIN
+    BUTTON_0 = BUTTON_0_GPIO_PIN,
+    BUTTON_1 = BUTTON_1_GPIO_PIN,
+    BUTTON_2 = BUTTON_2_GPIO_PIN,
 }BUTTON;
 
 void button_init(void);

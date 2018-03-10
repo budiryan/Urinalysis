@@ -28,6 +28,7 @@ void init_system(void){
     pump_init();
     stepper_init();
     uart_init(COM3, 9600);
+    button_init();
     ticks_init();
     delay_init();
     TM_ILI9341_Init();
