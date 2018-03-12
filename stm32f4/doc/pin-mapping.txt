@@ -49,3 +49,6 @@ Bluetooth RX: PB10 USART3
 Bluetooth TX: PB11 USART3
 VCC (3.3V)
 GND
+
+LCD Cable Routing Order:
+Red --> Black --> Grey --> Yellow --> Brown --> White --> Purple --> Orange

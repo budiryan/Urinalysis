@@ -494,19 +494,29 @@ void display_analysis(u16 image[], u16 array_length, COLOR_TYPE color){
     r = r / 32.0f * 255.0f;
     g = g / 32.0f * 255.0f;
     b = b / 32.0f * 255.0f;
+    
+    float X = 0.0;
+    float Y = 0.0;
+    float Z = 0.0;
+    float L = 0.0;
+    float A = 0.0;
+    float B = 0.0;
+    convertRGBtoXYZ(r, g, b, &X, &Y, &Z);
+    convertXYZtoLab(X, Y, Z, &L, &A, &B);
+    
     COLOR_OBJECT test = {r, g, b, 0};
     TM_ILI9341_Puts(0, 140, "               ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     TM_ILI9341_Puts(0, 160, "               ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     TM_ILI9341_Puts(0, 180, "               ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    TM_ILI9341_Puts(0, 140, "R: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    TM_ILI9341_Puts(0, 160, "G: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    TM_ILI9341_Puts(0, 140, "L: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    TM_ILI9341_Puts(0, 160, "A: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     TM_ILI9341_Puts(0, 180, "B: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     
-    sprintf(str, "%d", r);
+    sprintf(str, "%.2f", L);
     TM_ILI9341_Puts(20, 140, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    sprintf(str, "%d", g);
+    sprintf(str, "%.2f", A);
     TM_ILI9341_Puts(20, 160, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    sprintf(str, "%d", b);
+    sprintf(str, "%.2f", B);
     TM_ILI9341_Puts(20, 180, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
    
     

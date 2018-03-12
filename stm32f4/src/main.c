@@ -1,13 +1,5 @@
 #include "main.h"
 
-
-static bool capture_cam = false;
-extern float interpolation_score;
-char str[40];
-int pump_time_stamp;
-URINALYSIS_PROCESS process = IDLE;
-int motor_time_stamp;
-
 // Constant Definition
 #define PUMP_DURATION 105
 #define MOTOR_DURATION_US 762500
@@ -16,10 +8,18 @@ int motor_time_stamp;
 #define WAIT_DURATION 6000
 const int MOTOR_DURATION_SECTION = 550;
 
+static bool capture_cam = false;
+extern float interpolation_score;
+char str[40];
+int pump_time_stamp;
+URINALYSIS_PROCESS process = IDLE;
+int motor_time_stamp;
+
 PUMP_STATUS pump_status = PUMP_STOP;
 PUMP_STATUS pump_reverse_status = PUMP_STOP;
 STEPPER_STATUS stepper_status = STEPPER_STOP;
 STEPPER_STATUS stepper_status_2 = STEPPER_STOP;
+USER current_user = USER1;
 
 
 /*
@@ -100,11 +100,17 @@ on_receive_listener * listener = &receiver;
 
 
 int main() {
+    /*
+    Data format to be sent through Bluetooth:
+    Flag to trigger | user | glucose value | urine value 
+    */
+    
     init_system();
-
-    uart_tx(COM3, "Welcome to FYP Urinalysis System!\r\n");
     // Initialize bluetooth listener
     uart_interrupt_init(COM3, listener);
+    uart_tx(COM3, "Welcome to FYP Urinalysis System!\r\n");
+    
+
     
     while(true){
         if (capture_cam == true) {
@@ -112,7 +118,25 @@ int main() {
              TM_ILI9341_DisplayImage((u16 *) frame_buffer);
         }
         sprintf(str, "%d %d %d", button_pressed(BUTTON_0), button_pressed(BUTTON_1), button_pressed(BUTTON_2));
+        
+        // User presses one of the button depending on who they are
+        if(button_pressed(BUTTON_0)){
+            current_user = USER1;
+            process = SEND_DATA;
+        }
+        
+        if(button_pressed(BUTTON_1)){
+            current_user = USER2;
+            process = SEND_DATA;
+        }
+        
+        if(button_pressed(BUTTON_2)){
+            current_user = USER3;
+            process = SEND_DATA;
+        }
+        
         TM_ILI9341_Puts(180, 80, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+        
         
         switch(process){
             case MOVE_ONE_SECTION_CCW:
@@ -195,10 +219,33 @@ int main() {
                     pump(50, PUMP_CW, 0);
                 }
                 break;
+            case SEND_DATA:
+                strcpy(str, "Urine");
+                strcat(str, "|");
+                switch(current_user){
+                    case USER1:
+                        strcat(str, "0");
+                        break;
+                    case USER2:
+                        strcat(str, "1");
+                        break;
+                    case USER3:
+                        strcat(str, "2");
+                        break;
+                }
+                strcat(str, "|");
+                strcat(str, "300");
+                strcat(str, "|");
+                strcat(str, "8");
+                uart_tx(COM3, str);
+                process = IDLE;
+                break;
             case IDLE:
                 // do nothing, rofl
                 clear_counter();
                 TM_ILI9341_Puts(180, 20, "IDLE", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+                if(get_full_ticks() % 10 == 0)
+                    uart_tx(COM3, "Connected, Waiting for data!");
                 break;
         }
  

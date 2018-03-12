@@ -19,8 +19,16 @@ typedef enum{
     SAVE_TO_SD_CARD,
     MOVE_ONE_SECTION_CCW,
     MOVE_ONE_SECTION_CW,
+    SEND_DATA,
     IDLE
 }URINALYSIS_PROCESS;
+
+
+typedef enum{
+    USER1,
+    USER2,
+    USER3
+}USER;
 
 void init_system(void);
 char * itoa (int value, char *result, int base);

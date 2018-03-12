@@ -25,11 +25,11 @@
 
 // Point where segmentation of the camera starts
 #define START_SEGMENT_ROWS      55
-#define START_SEGMENT_COLUMNS   80
+#define START_SEGMENT_COLUMNS   90
 
 // Width & Height of the segmentation area
-#define SEGMENT_ROWS            18
-#define SEGMENT_COLUMNS         18
+#define SEGMENT_ROWS            12
+#define SEGMENT_COLUMNS         12
 
 // Total number of pixels. Basically CAMERA_COLUMNS * CAMERA_ROWS
 #define CAMERA_PIXEL            19200
