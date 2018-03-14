@@ -11,16 +11,16 @@ extern volatile u16 frame_buffer[CAMERA_ROWS * CAMERA_COLUMNS];
 extern volatile u16 segmentation[SEGMENT_ROWS * SEGMENT_COLUMNS];
 
 typedef enum{
-    PUMP_URINE, 
-    ROTATE_MOTOR, 
+    PUMP_URINE,
+    PUMP_URINE_COLOR,
     CLEAN_PUMP,
-    PERFORM_ANALYSIS,
+    PERFORM_ANALYSIS_GLUCOSE,
+    PERFORM_ANALYSIS_COLOR,
     MOVE_ONE_SECTION_CCW,
     MOVE_ONE_SECTION_CW,
     SEND_DATA,
     IDLE
 }URINALYSIS_PROCESS;
-
 
 typedef enum{
     USER1,
@@ -30,7 +30,6 @@ typedef enum{
 
 void init_system(void);
 char * itoa (int value, char *result, int base);
-void analyze_dipstick_paper(void);
 void sd_transfer_data(float interpolation_score);
 void clear_counter(void);
 #endif

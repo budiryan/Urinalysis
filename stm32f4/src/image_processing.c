@@ -9,6 +9,31 @@
 #define REF5_VAL {63, 87, 79, 500}
 #define REF6_VAL {47, 55, 55, 1000}
 
+COLOR_OBJECT ref1 = REF1_VAL;
+COLOR_OBJECT ref2 = REF2_VAL;
+COLOR_OBJECT ref3 = REF3_VAL;
+COLOR_OBJECT ref4 = REF4_VAL;
+COLOR_OBJECT ref5 = REF5_VAL;
+COLOR_OBJECT ref6 = REF6_VAL;
+
+// Reference Color for Urine Color scores
+#define REF1_VAL_COLOR {167, 167, 151, 1}
+#define REF2_VAL_COLOR {143, 151, 119, 2}
+#define REF3_VAL_COLOR {143, 143, 111, 3}
+#define REF4_VAL_COLOR {151, 151, 95, 4}
+#define REF5_VAL_COLOR {143, 135, 63, 5}
+#define REF6_VAL_COLOR {135, 127, 47, 6}
+#define REF7_VAL_COLOR {135, 111 ,39, 7}
+#define REF8_VAL_COLOR {109, 103, 39, 8}
+
+COLOR_OBJECT ref1_color = REF1_VAL_COLOR;
+COLOR_OBJECT ref2_color = REF2_VAL_COLOR;
+COLOR_OBJECT ref3_color = REF3_VAL_COLOR;
+COLOR_OBJECT ref4_color = REF4_VAL_COLOR;
+COLOR_OBJECT ref5_color = REF5_VAL_COLOR;
+COLOR_OBJECT ref6_color = REF6_VAL_COLOR;
+COLOR_OBJECT ref7_color = REF7_VAL_COLOR;
+COLOR_OBJECT ref8_color = REF8_VAL_COLOR;
 
 // Constants used by LAB formula for rgb transformation
 extern char str[40];
@@ -23,12 +48,9 @@ volatile u16 segmentation[SEGMENT_ROWS * SEGMENT_COLUMNS];
 // The whole camera array
 volatile u16 frame_buffer[CAMERA_ROWS * CAMERA_COLUMNS];
 
-COLOR_OBJECT ref1 = REF1_VAL;
-COLOR_OBJECT ref2 = REF2_VAL;
-COLOR_OBJECT ref3 = REF3_VAL;
-COLOR_OBJECT ref4 = REF4_VAL;
-COLOR_OBJECT ref5 = REF5_VAL;
-COLOR_OBJECT ref6 = REF6_VAL;
+uint64_t r;
+uint64_t g;
+uint64_t b;
 
 
 /***************************************************
@@ -109,9 +131,7 @@ void assign_interpolation_index(int * idx_b, int * idx_c, int idx_n, const int N
     *idx_c = idx_n + 1;
 }
 
-/*
 
-*/
 
 /***************************************************
  *  Returns:     Interpolation value from reference
@@ -128,6 +148,48 @@ float interpolate(COLOR_OBJECT test_data){
     const int NUM_REFERENCE = 6;
     const int NUM_STAGE = NUM_REFERENCE - 1;
     COLOR_OBJECT ref_data[NUM_REFERENCE] = {ref1, ref2, ref3, ref4, ref5, ref6};
+    
+    
+    float ref_dist[NUM_STAGE];
+    float test_ref_dist[NUM_REFERENCE];
+    int idx_n,idx_b, idx_c;
+    float cx, bx, final_score;
+   
+    // Calculate the distance within reference data
+    for(int i=0; i < NUM_STAGE; i++){
+        ref_dist[i] = RGB_color_Lab_difference_CIE76(ref_data[i], ref_data[i + 1]);
+    }
+
+    // Calculate the distance from test data to each of the reference data
+    for(int i=0; i < NUM_REFERENCE; i++){
+        test_ref_dist[i] = RGB_color_Lab_difference_CIE76(test_data, ref_data[i]);
+    }
+    
+    /* USEFUL FOR DEBUGGING
+    sprintf(str, "%.2f\n%.2f\n%.2f\n%.2f\n%.2f\n%.2f",test_ref_dist[0],test_ref_dist[1],test_ref_dist[2],test_ref_dist[3],test_ref_dist[4],test_ref_dist[5]);
+    TM_ILI9341_Puts(180, 40, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    sprintf(str, "%.2f\n%.2f\n%.2f\n%.2f\n%.2f",ref_dist[0],ref_dist[1],ref_dist[2],ref_dist[3],ref_dist[4]);
+    TM_ILI9341_Puts(240, 40, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    */
+    
+    idx_n = smallest_arg(test_ref_dist, NUM_STAGE);
+    
+    assign_interpolation_index(&idx_b, &idx_c, idx_n, NUM_REFERENCE, ref_dist, test_ref_dist);
+    // use trigonometry formula to find cx
+    cx = (powf(test_ref_dist[idx_b], 2.0f) - powf(ref_dist[idx_b], 2.0f) - powf(test_ref_dist[idx_c], 2.0f)) / (-2.0f * ref_dist[idx_b]);
+    // score of the test data is finally evaluated
+    bx = ref_dist[idx_b] - cx;
+    final_score = ((bx / ref_dist[idx_b]) * (float)(ref_data[idx_c].score - ref_data[idx_b].score)) + ref_data[idx_b].score;
+    return final_score;
+}
+
+float interpolate_color(COLOR_OBJECT test_data){
+    // Define reference data, test data and other necessary flags + variables
+    const int NUM_REFERENCE = 8;
+    const int NUM_STAGE = NUM_REFERENCE - 1;
+    COLOR_OBJECT ref_data[NUM_REFERENCE] = {ref1_color, ref2_color, ref3_color, ref4_color, ref5_color, ref6_color};
+    
+    
     float ref_dist[NUM_STAGE];
     float test_ref_dist[NUM_REFERENCE];
     int idx_n,idx_b, idx_c;
@@ -380,9 +442,9 @@ float RGB_color_Lab_difference_CIE76(COLOR_OBJECT color1, COLOR_OBJECT color2){
  ***************************************************/
 float Lab_color_difference_CIE94( float inL1, float ina1, float  inb1, float inL2, float ina2, float  inb2){
 	// case Application.GraphicArts:
-		float Kl = 1.0;
-		float K1 = 0.045;
-		float K2 = 0.015;
+    float Kl = 1.0;
+	float K1 = 0.045;
+	float K2 = 0.015;
 	// 	break;
 	// case Application.Textiles:
 	// 	Kl = 2.0;
@@ -445,20 +507,42 @@ float RGB_color_Lab_difference_CIE94( int R1, int G1, int B1, int R2, int G2, in
 
 /***************************************************
  *  Returns:     Information on LCD, nothing returned by this function
- *
+ 
  *  Parameters:  Image array, length of the array, RGB 565 OR RGB 555 color format
  *
  *  Description: Displays the average R, G ,B element of an image array,
  *               Also displays interpolation value of the segmented color array
  *
  ***************************************************/
-void display_analysis(u16 image[], u16 array_length, COLOR_TYPE color){
+float display_analysis(ANALYSIS_TYPE analysis_type){ 
+    COLOR_OBJECT test = {r, g, b, 0};
+    // analysis type: 0 for glucose, 1 for urine color
+    switch(analysis_type){
+        case GLUCOSE:
+            TM_ILI9341_Puts(100, 160, "         ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+            TM_ILI9341_Puts(100, 140, "Glucose score:", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+            interpolation_score = interpolate(test) > 0 ? interpolate(test) : 1;
+            sprintf(str, "%.2f", interpolation_score);
+            TM_ILI9341_Puts(100, 160, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+            break;
+        case COLOR:
+            TM_ILI9341_Puts(100, 200, "         ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+            TM_ILI9341_Puts(100, 180, "Color score:", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+            interpolation_score = interpolate_color(test) > 0 ? interpolate_color(test) : 1;
+            sprintf(str, "%.2f", interpolation_score);
+            TM_ILI9341_Puts(100, 200, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+            break;
+    }
+    return interpolation_score;
+}
+
+
+void display_color_info(u16 image[], u16 array_length, COLOR_TYPE color){
     // Clear the score screen
-    TM_ILI9341_Puts(100, 160, "          ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     
-    uint64_t r = 0;
-    uint64_t g = 0;
-    uint64_t b = 0;
+    r = 0;
+    g = 0;
+    b = 0;
     uint64_t temp = 0;
     uint64_t overall = 0;
    
@@ -507,10 +591,9 @@ void display_analysis(u16 image[], u16 array_length, COLOR_TYPE color){
     convertRGBtoXYZ(r, g, b, &X, &Y, &Z);
     convertXYZtoLab(X, Y, Z, &L, &A, &B);
     
-    COLOR_OBJECT test = {r, g, b, 0};
-    TM_ILI9341_Puts(0, 140, "               ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    TM_ILI9341_Puts(0, 160, "               ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    TM_ILI9341_Puts(0, 180, "               ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    TM_ILI9341_Puts(0, 140, "        ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    TM_ILI9341_Puts(0, 160, "        ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    TM_ILI9341_Puts(0, 180, "        ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     TM_ILI9341_Puts(0, 140, "L: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     TM_ILI9341_Puts(0, 160, "A: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     TM_ILI9341_Puts(0, 180, "B: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
@@ -521,11 +604,5 @@ void display_analysis(u16 image[], u16 array_length, COLOR_TYPE color){
     TM_ILI9341_Puts(20, 160, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     sprintf(str, "%.2f", B);
     TM_ILI9341_Puts(20, 180, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-   
-    
-    
-    TM_ILI9341_Puts(100, 140, "glucose score:", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    interpolation_score = interpolate(test) > 0 ? interpolate(test) : 0;
-    sprintf(str, "%.2f", interpolation_score);
-    TM_ILI9341_Puts(100, 160, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+
 }

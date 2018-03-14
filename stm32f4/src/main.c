@@ -1,12 +1,10 @@
 #include "main.h"
 
 // Constant Definition
-#define PUMP_DURATION 15
-#define MOTOR_DURATION_US 762500
-#define MINI_PUMP_DURATION 2100
-#define ROTATION_COUNT 1
-#define WAIT_DURATION 6000
-const int MOTOR_DURATION_SECTION = 2820;
+#define PUMP_DURATION 20000
+#define MINI_PUMP_DURATION 6000
+#define CLEAN_PUMP_DURATION 20000
+const int MOTOR_DURATION_SECTION = 2800;
 
 static bool capture_cam = false;
 extern float interpolation_score;
@@ -19,7 +17,13 @@ PUMP_STATUS pump_status = PUMP_STOP;
 PUMP_STATUS pump_reverse_status = PUMP_STOP;
 STEPPER_STATUS stepper_status = STEPPER_STOP;
 STEPPER_STATUS stepper_status_2 = STEPPER_STOP;
+
+// For test result
 USER current_user = USER1;
+float glucose_score = 2.345;
+char glucose_score_string[5];
+float color_score = 3.45;
+char color_score_string[5];
 
 
 /*
@@ -90,7 +94,8 @@ void receiver(const uint8_t byte) {
             break;
         case 'c':
             uart_tx(COM3, "Analyzing segmented area \r\n");
-            analyze_dipstick_paper();
+            display_color_info((u16 *)segmentation, SEGMENT_ROWS * SEGMENT_COLUMNS, RGB565);
+            display_analysis(GLUCOSE);
             break;
     }
 
@@ -112,19 +117,50 @@ int main() {
     
     while(true){
         if (capture_cam == true) {
-             capture_cam = false;
-             TM_ILI9341_DisplayImage((u16 *) frame_buffer);
-             display_analysis((u16 *)segmentation, SEGMENT_ROWS * SEGMENT_COLUMNS, RGB565);
+            capture_cam = false;
+            TM_ILI9341_DisplayImage((u16 *) frame_buffer);
+            display_color_info((u16 *)segmentation, SEGMENT_ROWS * SEGMENT_COLUMNS, RGB565);
         }
-        sprintf(str, "%d %d %d", button_pressed(BUTTON_0), button_pressed(BUTTON_1), button_pressed(BUTTON_2));
+        
         if(button_pressed(BUTTON_0)){
             current_user = USER1;
             process = PUMP_URINE;
-            pump_time_stamp = get_seconds();
+            pump_time_stamp = get_full_ticks();
         }
 
-        TM_ILI9341_Puts(180, 80, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+        if(button_pressed(BUTTON_1)){
+            current_user = USER2;
+            process = PUMP_URINE;
+            pump_time_stamp = get_full_ticks();
+        }
+        
+        if(button_pressed(BUTTON_2)){
+            current_user = USER3;
+            process = PUMP_URINE;
+            pump_time_stamp = get_full_ticks();
+        }
+
         switch(process){
+            case PUMP_URINE:
+                clear_counter();
+                TM_ILI9341_Puts(180, 20, "ANALYZE", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+                TM_ILI9341_Puts(180, 40, "GLUCOSE", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+                sprintf(str, "%d", (get_full_ticks() - pump_time_stamp) / 1000);
+                TM_ILI9341_Puts(180, 60, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+                if(get_full_ticks() - pump_time_stamp < PUMP_DURATION)
+                    pump(50, PUMP_CCW, 1);
+                else{
+                    pump(50, PUMP_CW, 0);
+                    process = PERFORM_ANALYSIS_GLUCOSE;
+                }
+                break;
+            case PERFORM_ANALYSIS_GLUCOSE:
+                clear_counter();
+                display_color_info((u16 *)segmentation, SEGMENT_ROWS * SEGMENT_COLUMNS, RGB565);
+                glucose_score = display_analysis(GLUCOSE);
+                motor_time_stamp = get_full_ticks();
+                process = MOVE_ONE_SECTION_CW;
+                break;
             case MOVE_ONE_SECTION_CCW:
                 if((get_full_ticks() - motor_time_stamp) > MOTOR_DURATION_SECTION){
                     stepper_spin(1000, STEPPER_CCW, 0);
@@ -137,63 +173,43 @@ int main() {
             case MOVE_ONE_SECTION_CW:
                 if((get_full_ticks() - motor_time_stamp) > MOTOR_DURATION_SECTION){
                     stepper_spin(1000, STEPPER_CW, 0);
-                    process = IDLE;
+                    pump_time_stamp = get_full_ticks();
+                    process = PUMP_URINE_COLOR;
                 }
                 else{
                     stepper_spin(500, STEPPER_CW, 1);
                 }
                 break;
-            case PUMP_URINE:
+            case PUMP_URINE_COLOR:
                 clear_counter();
-                TM_ILI9341_Puts(180, 20, "PUMP URINE", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-                sprintf(str, "%d", get_seconds() - pump_time_stamp);
-                TM_ILI9341_Puts(180, 40, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-                if(get_seconds() - pump_time_stamp < PUMP_DURATION)
-                    pump(100, PUMP_CCW, 1);
+                TM_ILI9341_Puts(180, 20, "ANALYZE", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+                TM_ILI9341_Puts(180, 40, "COLOR", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+                sprintf(str, "%d", (get_full_ticks() - pump_time_stamp) / 1000);
+                TM_ILI9341_Puts(180, 60, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+                if(get_full_ticks() - pump_time_stamp < MINI_PUMP_DURATION)
+                    pump(50, PUMP_CCW, 1);
                 else{
                     motor_time_stamp = get_full_ticks();
-                    pump(100, PUMP_CW, 0);
-                    process = MOVE_ONE_SECTION_CW;
+                    pump(50, PUMP_CW, 0);
+                    process = PERFORM_ANALYSIS_COLOR;
                 }
                 break;
-            case ROTATE_MOTOR:
+            case PERFORM_ANALYSIS_COLOR:
                 clear_counter();
-                TM_ILI9341_Puts(180, 20, "            ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-                TM_ILI9341_Puts(180, 40, "    ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-                TM_ILI9341_Puts(180, 20, "ROTATE", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-                for(int i = 0; i < ROTATION_COUNT; i++){
-                    sprintf(str, "%d", i + 1);
-                    TM_ILI9341_Puts(180, 40, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-                    pump(400, PUMP_CCW, 1);
-                    stepper_spin(100, STEPPER_CW, 1);
-                    delay_us(3 * MOTOR_DURATION_US);
-                    // After some second, stop
-                    stepper_spin(100, STEPPER_CW, 0);
-                    pump(400, PUMP_CCW, 0);
-                    delay_ms(MINI_PUMP_DURATION);
-                }
-                // wait 4 sec to let the urine flows
-                pump(0, PUMP_CCW, 0);
-                TM_ILI9341_Puts(180, 20, "WAIT   ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-                delay_ms(WAIT_DURATION);
-                process = PERFORM_ANALYSIS;
-                break;
-            case PERFORM_ANALYSIS:
-                clear_counter();
-                TM_ILI9341_Puts(100, 160, "             ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-                TM_ILI9341_Puts(180, 20, "ANALYZING", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-                analyze_dipstick_paper();
-                process = SEND_DATA;
+                display_color_info((u16 *)segmentation, SEGMENT_ROWS * SEGMENT_COLUMNS, RGB565);
+                color_score = display_analysis(COLOR);
+                pump_time_stamp = get_full_ticks();
+                process = CLEAN_PUMP;
                 break;
             case CLEAN_PUMP:
                 clear_counter();
                 TM_ILI9341_Puts(180, 20, "CLEAN PUMP", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-                sprintf(str, "%d", get_seconds() - pump_time_stamp);
-                TM_ILI9341_Puts(180, 40, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-                if(get_seconds() - pump_time_stamp < PUMP_DURATION)
+                sprintf(str, "%d", (get_full_ticks() - pump_time_stamp) / 1000);
+                TM_ILI9341_Puts(180, 60, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+                if(get_full_ticks() - pump_time_stamp < PUMP_DURATION)
                     pump(50, PUMP_CW, 1);
                 else{
-                    process = IDLE;
+                    process = SEND_DATA;
                     pump(50, PUMP_CW, 0);
                 }
                 break;
@@ -213,9 +229,12 @@ int main() {
                         break;
                 }
                 strcat(str, "|");
-                strcat(str, "250");
+                sprintf(glucose_score_string, "%.2f", glucose_score);
+                strcat(str, glucose_score_string);
                 strcat(str, "|");
-                strcat(str, "6.0");
+                sprintf(color_score_string, "%.2f", color_score);
+                strcat(str, color_score_string);
+                uart_tx(COM3, "       ");
                 uart_tx(COM3, str);
                 process = IDLE;
                 break;
@@ -223,8 +242,6 @@ int main() {
                 // do nothing, rofl
                 clear_counter();
                 TM_ILI9341_Puts(180, 20, "IDLE", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-                if(get_full_ticks() % 10 == 0)
-                    uart_tx(COM3, "Connected, Waiting for data!");
                 break;
         }
  
@@ -241,56 +258,3 @@ void DMA2_Stream1_IRQHandler(void){
         capture_cam = true;
     }
 }
-
-/*
-// Handle PD0 interrupt for Button 1
-void EXTI0_IRQHandler(void) {
-    if (EXTI_GetITStatus(EXTI_Line0) != RESET) {
-        // Do your stuff when PD0 is changed 
-        current_user = USER1;
-        process = PUMP_URINE;
-        pump_time_stamp = get_seconds();
-        // Clear interrupt flag
-        EXTI_ClearITPendingBit(EXTI_Line0);
-    }
-}
-*/
-
-/*
-// Handle PD1 interrupt for Button 2
-void EXTI1_IRQHandler(void) {
-    if (EXTI_GetITStatus(EXTI_Line1) != RESET) {
-        // Do your stuff when PD1 is changed
-        current_user = USER2;
-        process = SEND_DATA;
-        motor_time_stamp = get_full_ticks();
-        process = MOVE_ONE_SECTION_CW;
-        
-        // Clear interrupt flag
-        EXTI_ClearITPendingBit(EXTI_Line1);
-    }
-}
-*/
-
-/*
-// Handle PD2 interrupt for Button 3
-void EXTI2_IRQHandler(void) {
-    if (EXTI_GetITStatus(EXTI_Line2) != RESET) {
-        // Do your stuff when PD2 is changed 
-        current_user = USER3;
-        
-        // Clear interrupt flag
-        EXTI_ClearITPendingBit(EXTI_Line2);
-    }
-}
-*/
-
-
-
-
-
-
-
-
-
-

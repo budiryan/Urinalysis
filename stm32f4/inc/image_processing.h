@@ -24,8 +24,8 @@
 #define CAMERA_ROWS             120
 
 // Point where segmentation of the camera starts
-#define START_SEGMENT_ROWS      55
-#define START_SEGMENT_COLUMNS   90
+#define START_SEGMENT_ROWS      60
+#define START_SEGMENT_COLUMNS   75
 
 // Width & Height of the segmentation area
 #define SEGMENT_ROWS            12
@@ -33,7 +33,6 @@
 
 // Total number of pixels. Basically CAMERA_COLUMNS * CAMERA_ROWS
 #define CAMERA_PIXEL            19200
-
 
 typedef enum {
   RGB565, RGB555
@@ -46,9 +45,14 @@ typedef struct {
     int score;
 } COLOR_OBJECT;
 
+typedef enum{
+    GLUCOSE,
+    COLOR
+}ANALYSIS_TYPE;
 
 s16 calculate_angle(float R1, float G1, float B1, float R2, float G2, float  B2);
 float interpolate(COLOR_OBJECT test_data);
+float interpolate_color(COLOR_OBJECT test_data);
 void convertRGBtoXYZ(int inR, int inG, int inB, float * outX, float * outY, float * outZ);
 void convertXYZtoLab(float inX, float inY, float inZ, float * outL, float * outa, float * outb);
 void convertLabtoXYZ( float inL, float ina, float  inb, float * outX, float * outY, float * outZ);
@@ -58,6 +62,7 @@ float RGB_color_Lab_difference_CIE76(COLOR_OBJECT color1, COLOR_OBJECT color2);
 float Lab_color_difference_CIE94( float inL1, float ina1, float  inb1, float inL2, float ina2, float  inb2);
 float RGB_color_Lab_difference_CIE94( int R1, int G1, int B1, int R2, int G2, int B2);
 
-void display_analysis(u16 image[], u16 array_length, COLOR_TYPE color);
+float display_analysis(ANALYSIS_TYPE analysis_type);
+void display_color_info(u16 image[], u16 array_length, COLOR_TYPE color);
 
 #endif

@@ -98,13 +98,6 @@ char * itoa (int value, char *result, int base)
     return result;
 }
 
-// Display camera picture image on screen and prints all the analysis
-void analyze_dipstick_paper(){
-    TM_ILI9341_Puts(180, 20, "Analyzing", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    display_analysis((u16 *)segmentation, SEGMENT_ROWS * SEGMENT_COLUMNS, RGB565);
-    TM_ILI9341_Puts(180, 20, "         ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-}
-
 // Transfers interpolation score to SD card
 void sd_transfer_data(float interpolation_score){
     TM_ILI9341_Puts(180, 200, "                ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
@@ -131,5 +124,6 @@ void sd_transfer_data(float interpolation_score){
 // Utility function to clear certain area of the LCD screen
 void clear_counter(){
     TM_ILI9341_Puts(180, 20, "            ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    TM_ILI9341_Puts(180, 40, "    ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    TM_ILI9341_Puts(180, 40, "            ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    TM_ILI9341_Puts(180, 60, "            ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
 }
