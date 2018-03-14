@@ -15,8 +15,6 @@ typedef enum{
     ROTATE_MOTOR, 
     CLEAN_PUMP,
     PERFORM_ANALYSIS,
-    ALERT_BLUETOOTH,
-    SAVE_TO_SD_CARD,
     MOVE_ONE_SECTION_CCW,
     MOVE_ONE_SECTION_CW,
     SEND_DATA,
@@ -34,6 +32,5 @@ void init_system(void);
 char * itoa (int value, char *result, int base);
 void analyze_dipstick_paper(void);
 void sd_transfer_data(float interpolation_score);
-void send_bluetooth(void);
 void clear_counter(void);
 #endif

@@ -453,6 +453,9 @@ float RGB_color_Lab_difference_CIE94( int R1, int G1, int B1, int R2, int G2, in
  *
  ***************************************************/
 void display_analysis(u16 image[], u16 array_length, COLOR_TYPE color){
+    // Clear the score screen
+    TM_ILI9341_Puts(100, 160, "          ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    
     uint64_t r = 0;
     uint64_t g = 0;
     uint64_t b = 0;

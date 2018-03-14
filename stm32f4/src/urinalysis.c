@@ -10,7 +10,6 @@ FATFS FatFs;
 FIL fil;
 FRESULT fres;
 
-
 /***************************************************
  *  Returns: Nothing
  *
@@ -38,6 +37,11 @@ void init_system(void){
     TM_ILI9341_Puts(180, 0, "STATUS: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     OV9655_Configuration();
     DCMI_CaptureCmd(ENABLE);
+    // Interrupt configuration for the buttons
+    // button_1_interrupt_config();
+    // button_2_interrupt_config();
+    // button_3_interrupt_config();
+    
 }
 
 
@@ -124,17 +128,8 @@ void sd_transfer_data(float interpolation_score){
     fres = f_mount(0, "", 1);
 }
 
-// Sends interpolation result via Bluetooth
-void send_bluetooth(){
-    TM_ILI9341_Puts(180, 200, "BT trans OK", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-    if (interpolation_score > 20)
-        uart_tx(COM3, "ALERT! Glucose level is high! it is at %.3f mg/dL \n", interpolation_score);
-    else
-        uart_tx(COM3, "Glucose level is normal at: %.3f mg/dL \n", interpolation_score);
-}
-
 // Utility function to clear certain area of the LCD screen
 void clear_counter(){
-    TM_ILI9341_Puts(180, 20, "           ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    TM_ILI9341_Puts(180, 20, "            ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     TM_ILI9341_Puts(180, 40, "    ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
 }

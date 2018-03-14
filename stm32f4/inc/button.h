@@ -21,5 +21,8 @@ typedef enum{
 
 void button_init(void);
 u8 button_pressed(BUTTON button);
+void button_1_interrupt_config(void);
+void button_2_interrupt_config(void);
+void button_3_interrupt_config(void);
 
 #endif

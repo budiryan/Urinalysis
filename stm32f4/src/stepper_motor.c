@@ -60,7 +60,7 @@ void _stepper_step_init(void){
 	TIM_TimeBaseStructure.TIM_RepetitionCounter = 0;
 
     //clk=168M/(167+1)=1 MHz, Freq = 1000000 / 400 = 2500Hz
-	TIM_TimeBaseStructure.TIM_Prescaler = 399;
+	TIM_TimeBaseStructure.TIM_Prescaler = 3999;
     //pulse cycle= 400 
 	TIM_TimeBaseStructure.TIM_Period = 100;
 
