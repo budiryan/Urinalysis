@@ -1,24 +1,32 @@
 #include "main.h"
 
 // Constant Definition
-#define PUMP_DURATION 20000
-#define MINI_PUMP_DURATION 6000
-#define CLEAN_PUMP_DURATION 20000
-const int MOTOR_DURATION_SECTION = 2800;
+
+// Pump duration without extension
+// #define PUMP_DURATION 22000
+// #define CLEAN_PUMP_DURATION 22000
+
+#define PUMP_DURATION 65000
+#define CLEAN_PUMP_DURATION 54000
+
+#define MINI_PUMP_DURATION 10000
+#define DO_NOTHING_DURATION 6000
+
+const int MOTOR_DURATION_SECTION = 2700;
 
 static bool capture_cam = false;
 extern float interpolation_score;
 char str[40];
 int pump_time_stamp;
-URINALYSIS_PROCESS process = IDLE;
 int motor_time_stamp;
+URINALYSIS_PROCESS process = IDLE;
 
 PUMP_STATUS pump_status = PUMP_STOP;
 PUMP_STATUS pump_reverse_status = PUMP_STOP;
 STEPPER_STATUS stepper_status = STEPPER_STOP;
 STEPPER_STATUS stepper_status_2 = STEPPER_STOP;
 
-// For test result
+// For example test result
 USER current_user = USER1;
 float glucose_score = 2.345;
 char glucose_score_string[5];
@@ -64,7 +72,7 @@ void receiver(const uint8_t byte) {
             uart_tx(COM3, "Motor move one section CCW\r\n");
             motor_time_stamp = get_full_ticks();
             stepper_spin(1400, STEPPER_CCW, 1);
-            process = MOVE_ONE_SECTION_CCW;
+            process = MOVE_ONE_SECTION_CW_2;
             break;
         case 'b':
             // Move stepper motor one section CW
@@ -76,12 +84,12 @@ void receiver(const uint8_t byte) {
         case 'p':
             switch(pump_status){
                 case PUMP_STOP:
-                    uart_tx(COM3, " Pump sucking \r\n");
+                    uart_tx(COM3, "Pump sucking \r\n");
                     pump(50, PUMP_CCW, 1); // Sucking into the system
                     pump_status = PUMP_PUMP;
                 break;
                 case PUMP_PUMP:
-                    uart_tx(COM3, " Pump release \r \n");
+                    uart_tx(COM3, "Pump release \r \n");
                     pump(50, PUMP_CW, 1); // Throwing the water away
                     pump_status = PUMP_STOP;
                 break;
@@ -96,6 +104,7 @@ void receiver(const uint8_t byte) {
             uart_tx(COM3, "Analyzing segmented area \r\n");
             display_color_info((u16 *)segmentation, SEGMENT_ROWS * SEGMENT_COLUMNS, RGB565);
             display_analysis(GLUCOSE);
+            display_analysis(COLOR);
             break;
     }
 
@@ -151,6 +160,18 @@ int main() {
                     pump(50, PUMP_CCW, 1);
                 else{
                     pump(50, PUMP_CW, 0);
+                    pump_time_stamp = get_full_ticks();
+                    process = DO_NOTHING;
+                }
+                break;
+            case DO_NOTHING:
+                clear_counter();
+                TM_ILI9341_Puts(180, 20, "WAIT", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+                sprintf(str, "%d", (get_full_ticks() - pump_time_stamp) / 1000);
+                TM_ILI9341_Puts(180, 60, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+                if(get_full_ticks() - pump_time_stamp < DO_NOTHING_DURATION)
+                    pump(50, PUMP_CCW, 0);
+                else{
                     process = PERFORM_ANALYSIS_GLUCOSE;
                 }
                 break;
@@ -160,15 +181,6 @@ int main() {
                 glucose_score = display_analysis(GLUCOSE);
                 motor_time_stamp = get_full_ticks();
                 process = MOVE_ONE_SECTION_CW;
-                break;
-            case MOVE_ONE_SECTION_CCW:
-                if((get_full_ticks() - motor_time_stamp) > MOTOR_DURATION_SECTION){
-                    stepper_spin(1000, STEPPER_CCW, 0);
-                    process = IDLE;
-                }
-                else{
-                    stepper_spin(500, STEPPER_CCW, 1);
-                }
                 break;
             case MOVE_ONE_SECTION_CW:
                 if((get_full_ticks() - motor_time_stamp) > MOTOR_DURATION_SECTION){
@@ -198,20 +210,7 @@ int main() {
                 clear_counter();
                 display_color_info((u16 *)segmentation, SEGMENT_ROWS * SEGMENT_COLUMNS, RGB565);
                 color_score = display_analysis(COLOR);
-                pump_time_stamp = get_full_ticks();
-                process = CLEAN_PUMP;
-                break;
-            case CLEAN_PUMP:
-                clear_counter();
-                TM_ILI9341_Puts(180, 20, "CLEAN PUMP", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-                sprintf(str, "%d", (get_full_ticks() - pump_time_stamp) / 1000);
-                TM_ILI9341_Puts(180, 60, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-                if(get_full_ticks() - pump_time_stamp < PUMP_DURATION)
-                    pump(50, PUMP_CW, 1);
-                else{
-                    process = SEND_DATA;
-                    pump(50, PUMP_CW, 0);
-                }
+                process = SEND_DATA;
                 break;
             case SEND_DATA:
                 TM_ILI9341_Puts(180, 20, "SENDING DATA", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
@@ -234,12 +233,34 @@ int main() {
                 strcat(str, "|");
                 sprintf(color_score_string, "%.2f", color_score);
                 strcat(str, color_score_string);
-                uart_tx(COM3, "       ");
                 uart_tx(COM3, str);
-                process = IDLE;
+                pump_time_stamp = get_full_ticks();
+                process = CLEAN_PUMP;
+                break;
+            case CLEAN_PUMP:
+                clear_counter(); 
+                TM_ILI9341_Puts(180, 20, "CLEAN PUMP", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+                sprintf(str, "%d", (get_full_ticks() - pump_time_stamp) / 1000);
+                TM_ILI9341_Puts(180, 60, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+                if(get_full_ticks() - pump_time_stamp < CLEAN_PUMP_DURATION)
+                    pump(50, PUMP_CW, 1);
+                else{
+                    process = MOVE_ONE_SECTION_CW_2;
+                    motor_time_stamp = get_full_ticks();
+                    pump(50, PUMP_CW, 0);
+                }
+                break;
+            case MOVE_ONE_SECTION_CW_2:
+                if((get_full_ticks() - motor_time_stamp) > MOTOR_DURATION_SECTION){
+                    stepper_spin(1000, STEPPER_CW, 0);
+                    process = IDLE;
+                }
+                else{
+                    stepper_spin(500, STEPPER_CW, 1);
+                }
                 break;
             case IDLE:
-                // do nothing, rofl
+                // do nothing
                 clear_counter();
                 TM_ILI9341_Puts(180, 20, "IDLE", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
                 break;

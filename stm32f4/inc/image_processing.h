@@ -24,8 +24,8 @@
 #define CAMERA_ROWS             120
 
 // Point where segmentation of the camera starts
-#define START_SEGMENT_ROWS      60
-#define START_SEGMENT_COLUMNS   75
+#define START_SEGMENT_ROWS      70
+#define START_SEGMENT_COLUMNS   70
 
 // Width & Height of the segmentation area
 #define SEGMENT_ROWS            12

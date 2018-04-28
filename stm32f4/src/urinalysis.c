@@ -26,7 +26,6 @@ void init_system(void){
     SystemInit();
     pump_init();
     stepper_init();
-    uart_init(COM3, 9600);
     button_init();
     ticks_init();
     delay_init();
@@ -35,13 +34,9 @@ void init_system(void){
     TM_ILI9341_Rotate(TM_ILI9341_Orientation_Landscape_1);
     TM_ILI9341_Puts(0, 0, "Urinalysis", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
     TM_ILI9341_Puts(180, 0, "STATUS: ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
+    uart_init(COM3, 9600);
     OV9655_Configuration();
     DCMI_CaptureCmd(ENABLE);
-    // Interrupt configuration for the buttons
-    // button_1_interrupt_config();
-    // button_2_interrupt_config();
-    // button_3_interrupt_config();
-    
 }
 
 
