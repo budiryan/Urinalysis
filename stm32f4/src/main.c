@@ -1,5 +1,6 @@
 #include "main.h"
 
+
 // Constant Definition
 
 // Pump duration without extension
@@ -123,6 +124,7 @@ int main() {
     // Initialize bluetooth listener
     uart_interrupt_init(COM3, listener);
     uart_tx(COM3, "Welcome to FYP Urinalysis System!\r\n");
+   
     
     while(true){
         if (capture_cam == true) {
@@ -133,7 +135,7 @@ int main() {
         
         if(button_pressed(BUTTON_0)){
             current_user = USER1;
-            process = PUMP_URINE;
+            process = PERFORM_ANALYSIS_GLUCOSE;
             pump_time_stamp = get_full_ticks();
         }
 
@@ -179,8 +181,9 @@ int main() {
                 clear_counter();
                 display_color_info((u16 *)segmentation, SEGMENT_ROWS * SEGMENT_COLUMNS, RGB565);
                 glucose_score = display_analysis(GLUCOSE);
+                // glucose_score = rand() % (900 + 1 - 800) + 800;
                 motor_time_stamp = get_full_ticks();
-                process = MOVE_ONE_SECTION_CW;
+                process = PERFORM_ANALYSIS_COLOR;
                 break;
             case MOVE_ONE_SECTION_CW:
                 if((get_full_ticks() - motor_time_stamp) > MOTOR_DURATION_SECTION){
@@ -210,7 +213,7 @@ int main() {
                 clear_counter();
                 display_color_info((u16 *)segmentation, SEGMENT_ROWS * SEGMENT_COLUMNS, RGB565);
                 color_score = display_analysis(COLOR);
-                process = SEND_DATA;
+                process = IDLE ; // change
                 break;
             case SEND_DATA:
                 TM_ILI9341_Puts(180, 20, "SENDING DATA", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);

@@ -56,6 +56,7 @@
 #include "usart.h"
 #include "urinalysis.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 extern volatile u16 frame_buffer[CAMERA_ROWS * CAMERA_COLUMNS];
 extern volatile u16 segmentation[SEGMENT_ROWS * SEGMENT_COLUMNS];

@@ -19,6 +19,7 @@
 #include "tm_stm32f4_ili9341.h"
 #include "approx_math.h"
 
+
 // Size of picture captured by OV9655 camera
 #define CAMERA_COLUMNS          160
 #define CAMERA_ROWS             120

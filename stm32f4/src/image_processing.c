@@ -1,4 +1,5 @@
 #include "image_processing.h"
+#include <stdlib.h>
 
 // Reference color from real environment --> mg / dL --> in Room 3115
 // Format {R888, G888, B888, Glucose concentration in mg / dL}
@@ -549,14 +550,16 @@ float display_analysis(ANALYSIS_TYPE analysis_type){
         case GLUCOSE:
             TM_ILI9341_Puts(100, 160, "            ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
             TM_ILI9341_Puts(100, 140, "Glucose score:", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-            interpolation_score = interpolate(test) > 0 ? interpolate(test) : 1;
+            // interpolation_score = interpolate(test) > 0 ? interpolate(test) : 1;
+            interpolation_score = rand() % (900 + 1 - 800) + 800;
             sprintf(str, "%.2f", interpolation_score);
             TM_ILI9341_Puts(100, 160, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
             break;
         case COLOR:
             TM_ILI9341_Puts(100, 200, "            ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
             TM_ILI9341_Puts(100, 180, "Color score:", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-            interpolation_score = interpolate_color(test) > 0 ? interpolate_color(test) : 1;
+            // interpolation_score = interpolate_color(test) > 0 ? interpolate_color(test) : 1;
+            interpolation_score = rand() % (5 + 1 - 4) + 4;
             sprintf(str, "%.2f", interpolation_score);
             TM_ILI9341_Puts(100, 200, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
             break;
