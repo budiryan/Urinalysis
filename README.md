@@ -1,5 +1,6 @@
 # Automatic Urine Analysis Device
-Codebase for the embedded device utilizing STM32F407 with OV9655 Camera
+Embedded systems codebase for the project: "Home - Based Device That Performs a Urine Test at Lab Level of Accuracy". <br>
+Winning project of HKUST's <a href="http://presidentscup.ust.hk/"> President's Cup </a> 2018.
 
 ## List of Files Which Are Often Interacted
 - <a href="https://github.com/budiryan/Urinalysis/blob/master/stm32f4/src/main.c">main</a>
