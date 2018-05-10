@@ -63,7 +63,7 @@ float RGB_color_Lab_difference_CIE76(COLOR_OBJECT color1, COLOR_OBJECT color2);
 float Lab_color_difference_CIE94( float inL1, float ina1, float  inb1, float inL2, float ina2, float  inb2);
 float RGB_color_Lab_difference_CIE94( int R1, int G1, int B1, int R2, int G2, int B2);
 
-float display_analysis(ANALYSIS_TYPE analysis_type);
+float display_analysis(ANALYSIS_TYPE analysis_type, int hardcode);
 void display_color_info(u16 image[], u16 array_length, COLOR_TYPE color);
 
 #endif

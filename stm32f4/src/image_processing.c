@@ -543,23 +543,27 @@ float RGB_color_Lab_difference_CIE94( int R1, int G1, int B1, int R2, int G2, in
  *               Also displays interpolation value of the segmented color array
  *
  ***************************************************/
-float display_analysis(ANALYSIS_TYPE analysis_type){ 
+float display_analysis(ANALYSIS_TYPE analysis_type, int hardcode){ 
     COLOR_OBJECT test = {red, green, blue, 0};
     // analysis type: 0 for glucose, 1 for urine color
     switch(analysis_type){
         case GLUCOSE:
             TM_ILI9341_Puts(100, 160, "            ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
             TM_ILI9341_Puts(100, 140, "Glucose score:", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-            // interpolation_score = interpolate(test) > 0 ? interpolate(test) : 1;
-            interpolation_score = rand() % (900 + 1 - 800) + 800;
+            if (!hardcode)
+                interpolation_score = interpolate(test) > 0 ? interpolate(test) : 1;
+            else
+                interpolation_score = rand() % (1000 + 1 - 900) + 900;
             sprintf(str, "%.2f", interpolation_score);
             TM_ILI9341_Puts(100, 160, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
             break;
         case COLOR:
             TM_ILI9341_Puts(100, 200, "            ", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
             TM_ILI9341_Puts(100, 180, "Color score:", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
-            // interpolation_score = interpolate_color(test) > 0 ? interpolate_color(test) : 1;
-            interpolation_score = rand() % (5 + 1 - 4) + 4;
+            if (!hardcode)
+                interpolation_score = interpolate_color(test) > 0 ? interpolate_color(test) : 1;
+            else
+                interpolation_score = rand() % (7 + 1 - 6) + 6;
             sprintf(str, "%.2f", interpolation_score);
             TM_ILI9341_Puts(100, 200, str, &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
             break;

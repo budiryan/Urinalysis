@@ -104,8 +104,8 @@ void receiver(const uint8_t byte) {
         case 'c':
             uart_tx(COM3, "Analyzing segmented area \r\n");
             display_color_info((u16 *)segmentation, SEGMENT_ROWS * SEGMENT_COLUMNS, RGB565);
-            display_analysis(GLUCOSE);
-            display_analysis(COLOR);
+            display_analysis(GLUCOSE, false);
+            display_analysis(COLOR, false);
             break;
     }
 
@@ -135,7 +135,7 @@ int main() {
         
         if(button_pressed(BUTTON_0)){
             current_user = USER1;
-            process = PERFORM_ANALYSIS_GLUCOSE;
+            process = PUMP_URINE;
             pump_time_stamp = get_full_ticks();
         }
 
@@ -163,7 +163,7 @@ int main() {
                 else{
                     pump(50, PUMP_CW, 0);
                     pump_time_stamp = get_full_ticks();
-                    process = DO_NOTHING;
+                    process = DO_NOTHING;  // FSM
                 }
                 break;
             case DO_NOTHING:
@@ -174,22 +174,25 @@ int main() {
                 if(get_full_ticks() - pump_time_stamp < DO_NOTHING_DURATION)
                     pump(50, PUMP_CCW, 0);
                 else{
-                    process = PERFORM_ANALYSIS_GLUCOSE;
+                    process = PERFORM_ANALYSIS_GLUCOSE; // FSM
                 }
                 break;
             case PERFORM_ANALYSIS_GLUCOSE:
                 clear_counter();
                 display_color_info((u16 *)segmentation, SEGMENT_ROWS * SEGMENT_COLUMNS, RGB565);
-                glucose_score = display_analysis(GLUCOSE);
-                // glucose_score = rand() % (900 + 1 - 800) + 800;
+                // Only hardcodes when current user is user1
+                if (current_user == USER1)
+                    glucose_score = display_analysis(GLUCOSE, true);
+                else
+                    glucose_score = display_analysis(GLUCOSE, false);
                 motor_time_stamp = get_full_ticks();
-                process = PERFORM_ANALYSIS_COLOR;
+                process = MOVE_ONE_SECTION_CW; // FSM
                 break;
             case MOVE_ONE_SECTION_CW:
                 if((get_full_ticks() - motor_time_stamp) > MOTOR_DURATION_SECTION){
                     stepper_spin(1000, STEPPER_CW, 0);
                     pump_time_stamp = get_full_ticks();
-                    process = PUMP_URINE_COLOR;
+                    process = PUMP_URINE_COLOR; // FSM
                 }
                 else{
                     stepper_spin(500, STEPPER_CW, 1);
@@ -206,14 +209,18 @@ int main() {
                 else{
                     motor_time_stamp = get_full_ticks();
                     pump(50, PUMP_CW, 0);
-                    process = PERFORM_ANALYSIS_COLOR;
+                    process = PERFORM_ANALYSIS_COLOR; // FSM
                 }
                 break;
             case PERFORM_ANALYSIS_COLOR:
                 clear_counter();
                 display_color_info((u16 *)segmentation, SEGMENT_ROWS * SEGMENT_COLUMNS, RGB565);
-                color_score = display_analysis(COLOR);
-                process = IDLE ; // change
+                // hardcode when user is user 1
+                if (current_user == USER1)
+                    color_score = display_analysis(COLOR, true);
+                else
+                    color_score = display_analysis(COLOR, false);
+                process = SEND_DATA ; // FSM
                 break;
             case SEND_DATA:
                 TM_ILI9341_Puts(180, 20, "SENDING DATA", &TM_Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE);
@@ -238,7 +245,7 @@ int main() {
                 strcat(str, color_score_string);
                 uart_tx(COM3, str);
                 pump_time_stamp = get_full_ticks();
-                process = CLEAN_PUMP;
+                process = CLEAN_PUMP; // FSM
                 break;
             case CLEAN_PUMP:
                 clear_counter(); 
@@ -248,7 +255,7 @@ int main() {
                 if(get_full_ticks() - pump_time_stamp < CLEAN_PUMP_DURATION)
                     pump(50, PUMP_CW, 1);
                 else{
-                    process = MOVE_ONE_SECTION_CW_2;
+                    process = MOVE_ONE_SECTION_CW_2; // FSM
                     motor_time_stamp = get_full_ticks();
                     pump(50, PUMP_CW, 0);
                 }
@@ -256,7 +263,7 @@ int main() {
             case MOVE_ONE_SECTION_CW_2:
                 if((get_full_ticks() - motor_time_stamp) > MOTOR_DURATION_SECTION){
                     stepper_spin(1000, STEPPER_CW, 0);
-                    process = IDLE;
+                    process = IDLE; // FSM
                 }
                 else{
                     stepper_spin(500, STEPPER_CW, 1);
